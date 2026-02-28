@@ -33,6 +33,7 @@
 - [ ] **Menu: "ClassSync" > "Sync"** - zamiast "Options" menu powinno nazywac sie "ClassSync", z jedna opcja "Sync"
 
 ## Do zrobienia (v0.5 - krytyczne)
+- [ ] **Walidacja XML** - sprawdzanie poprawnosci struktury XML przed obrobka; brak oficjalnej schemy ArchiCAD - trzeba napisac wlasna walidacje (wymagane tagi: BuildingInformation/Classification/System/Items/Item, wymagane pola Item: ID/Name/Description/Children, poprawnosc hierarchii, formaty ID); walidacja przed importem i po eksporcie
 - [ ] **Blokowanie XML (locking)** - mechanizm blokad zapobiegajacy jednoczesnej edycji tego samego XML przez wielu uzytkownikow; granularnosc do ustalenia: caly plik, fragment drzewa (galaz), lub pojedynczy obiekt; moze wybierany przez usera; plik lockowy obok XML lub sekcja w samym XML; musi obslugiwac crash recovery (stale locki)
 - [ ] **Changelog / sledzenie zmian** - dodatek generuje log zmian: kto edytowal, co zmienil, kiedy; format do ustalenia (osobny plik changelog obok XML, lub sekcja w XML); identyfikacja usera (nazwa komputera / login Windows / konfigurowalny nick)
 

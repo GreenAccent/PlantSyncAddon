@@ -72,7 +72,20 @@ static bool WriteFile (const char* filePath, const std::string& content)
 
 
 // ---------------------------------------------------------------------------
-// Helper: detect indentation at a given position (count tabs before tag)
+// Helper: detect line ending style used in the file
+// ---------------------------------------------------------------------------
+
+static std::string DetectEol (const std::string& xml)
+{
+	auto pos = xml.find ('\n');
+	if (pos != std::string::npos && pos > 0 && xml[pos - 1] == '\r')
+		return "\r\n";
+	return "\n";
+}
+
+
+// ---------------------------------------------------------------------------
+// Helper: detect indentation at a given position (count tabs/spaces before tag)
 // ---------------------------------------------------------------------------
 
 static std::string DetectIndent (const std::string& xml, size_t tagPos)
@@ -93,26 +106,73 @@ static std::string DetectIndent (const std::string& xml, size_t tagPos)
 
 
 // ---------------------------------------------------------------------------
-// Build an <Item> XML block
+// Helper: find start of a line (position right after the preceding newline)
+// ---------------------------------------------------------------------------
+
+static size_t FindLineStart (const std::string& xml, size_t pos)
+{
+	while (pos > 0 && xml[pos - 1] != '\n')
+		pos--;
+	return pos;
+}
+
+
+// ---------------------------------------------------------------------------
+// Helper: nesting-aware search for a closing tag
+// Finds the </tag> that matches the <tag> at openPos, skipping nested pairs.
+// ---------------------------------------------------------------------------
+
+static size_t FindMatchingClose (const std::string& xml,
+								  const std::string& openTag,
+								  const std::string& closeTag,
+								  size_t openPos)
+{
+	int depth = 1;
+	size_t pos = openPos + openTag.size ();
+
+	while (depth > 0 && pos < xml.size ()) {
+		auto nextOpen  = xml.find (openTag, pos);
+		auto nextClose = xml.find (closeTag, pos);
+
+		if (nextClose == std::string::npos)
+			return std::string::npos;
+
+		if (nextOpen != std::string::npos && nextOpen < nextClose) {
+			depth++;
+			pos = nextOpen + openTag.size ();
+		} else {
+			depth--;
+			if (depth == 0)
+				return nextClose;
+			pos = nextClose + closeTag.size ();
+		}
+	}
+	return std::string::npos;
+}
+
+
+// ---------------------------------------------------------------------------
+// Build an <Item> XML block with correct line endings
 // ---------------------------------------------------------------------------
 
 static std::string BuildItemXml (const ClassificationNode& node,
-								 const std::string& indent)
+								 const std::string& indent,
+								 const std::string& eol)
 {
 	std::string id   = EscapeXml (ToUtf8 (node.id));
 	std::string name = EscapeXml (ToUtf8 (node.name));
 	std::string desc = EscapeXml (ToUtf8 (node.description));
 
 	std::string xml;
-	xml += indent + "<Item>\n";
-	xml += indent + "\t<ID>" + id + "</ID>\n";
-	xml += indent + "\t<Name>" + name + "</Name>\n";
+	xml += indent + "<Item>" + eol;
+	xml += indent + "\t<ID>" + id + "</ID>" + eol;
+	xml += indent + "\t<Name>" + name + "</Name>" + eol;
 	if (desc.empty ())
-		xml += indent + "\t<Description/>\n";
+		xml += indent + "\t<Description/>" + eol;
 	else
-		xml += indent + "\t<Description>" + desc + "</Description>\n";
-	xml += indent + "\t<Children/>\n";
-	xml += indent + "</Item>\n";
+		xml += indent + "\t<Description>" + desc + "</Description>" + eol;
+	xml += indent + "\t<Children/>" + eol;
+	xml += indent + "</Item>" + eol;
 	return xml;
 }
 
@@ -162,6 +222,8 @@ bool AddItemToXml (const char* filePath,
 	if (!ReadFile (filePath, content))
 		return false;
 
+	std::string eol = DetectEol (content);
+
 	if (parentId.IsEmpty ()) {
 		// Add as root item under <Items>
 		auto itemsClose = content.rfind ("</Items>");
@@ -169,8 +231,11 @@ bool AddItemToXml (const char* filePath,
 			return false;
 
 		std::string indent = DetectIndent (content, itemsClose) + "\t";
-		std::string itemXml = BuildItemXml (node, indent);
-		content.insert (itemsClose, itemXml);
+		std::string itemXml = BuildItemXml (node, indent, eol);
+
+		// Insert at start of the </Items> line so existing indent is preserved
+		size_t lineStart = FindLineStart (content, itemsClose);
+		content.insert (lineStart, itemXml);
 
 	} else {
 		// Find the parent item by ID
@@ -193,21 +258,24 @@ bool AddItemToXml (const char* filePath,
 		{
 			// Self-closing <Children/> - replace with <Children>...<Item>...</Item>...</Children>
 			std::string indent = DetectIndent (content, childrenSelfClose);
-			std::string replacement = "<Children>\n";
-			replacement += BuildItemXml (node, indent + "\t");
+			std::string replacement = "<Children>" + eol;
+			replacement += BuildItemXml (node, indent + "\t", eol);
 			replacement += indent + "</Children>";
 			content.replace (childrenSelfClose, 11, replacement);  // 11 = strlen("<Children/>")
 
 		} else if (childrenOpen != std::string::npos && childrenOpen < parentClose) {
 			// Existing <Children>...</Children> - insert before </Children>
-			// Find the matching </Children>
-			auto childrenClose = content.find ("</Children>", childrenOpen);
+			// Nesting-aware search for the matching </Children>
+			auto childrenClose = FindMatchingClose (content, "<Children>", "</Children>", childrenOpen);
 			if (childrenClose == std::string::npos)
 				return false;
 
 			std::string indent = DetectIndent (content, childrenClose) + "\t";
-			std::string itemXml = BuildItemXml (node, indent);
-			content.insert (childrenClose, itemXml);
+			std::string itemXml = BuildItemXml (node, indent, eol);
+
+			// Insert at start of the </Children> line so existing indent is preserved
+			size_t lineStart = FindLineStart (content, childrenClose);
+			content.insert (lineStart, itemXml);
 
 		} else {
 			return false;
