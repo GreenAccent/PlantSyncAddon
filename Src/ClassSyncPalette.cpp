@@ -200,6 +200,15 @@ void ClassSyncPalette::PanelCloseRequested (const DG::PanelCloseRequestEvent& /*
 {
 	Hide ();
 	*accepted = true;
+
+	// Update menu checkmark (defined in ClassSync.cpp, called via palette callback)
+	API_MenuItemRef itemRef = {};
+	GSFlags         itemFlags = 0;
+	itemRef.menuResID = 32500;
+	itemRef.itemIndex = 1;
+	ACAPI_MenuItem_GetMenuItemFlags (&itemRef, &itemFlags);
+	itemFlags &= ~API_MenuItemChecked;
+	ACAPI_MenuItem_SetMenuItemFlags (&itemRef, &itemFlags);
 }
 
 

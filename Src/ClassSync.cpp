@@ -17,6 +17,30 @@ static const GSFlags kPaletteFlags =
 
 
 // ---------------------------------------------------------------------------
+// Helper: set menu checkmark to match palette visibility
+// ---------------------------------------------------------------------------
+
+static void UpdateMenuCheckmark ()
+{
+	bool visible = ClassSyncPalette::HasInstance () &&
+				   ClassSyncPalette::GetInstance ().IsVisible ();
+
+	API_MenuItemRef itemRef = {};
+	GSFlags         itemFlags = 0;
+
+	itemRef.menuResID = 32500;
+	itemRef.itemIndex = 1;
+
+	ACAPI_MenuItem_GetMenuItemFlags (&itemRef, &itemFlags);
+	if (visible)
+		itemFlags |= API_MenuItemChecked;
+	else
+		itemFlags &= ~API_MenuItemChecked;
+	ACAPI_MenuItem_SetMenuItemFlags (&itemRef, &itemFlags);
+}
+
+
+// ---------------------------------------------------------------------------
 // Menu command handler: toggle palette visibility
 // ---------------------------------------------------------------------------
 
@@ -35,6 +59,7 @@ static GSErrCode MenuCommandHandler (const API_MenuParams* menuParams)
 					ClassSyncPalette::GetInstance ().RefreshData ();
 				}
 			}
+			UpdateMenuCheckmark ();
 			break;
 	}
 

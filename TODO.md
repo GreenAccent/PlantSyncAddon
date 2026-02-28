@@ -38,7 +38,7 @@
 - [ ] **Changelog / sledzenie zmian** - dodatek generuje log zmian: kto edytowal, co zmienil, kiedy; format do ustalenia (osobny plik changelog obok XML, lub sekcja w XML); identyfikacja usera (nazwa komputera / login Windows / konfigurowalny nick)
 
 ## Do zrobienia (pozniej)
-- [ ] Menu checkmark (zaznaczenie gdy paleta otwarta)
+- [x] Menu checkmark (zaznaczenie gdy paleta otwarta)
 - [ ] Obsluga properties (import/export definicji)
 - [ ] Auto-odswiezanie po zmianach w projekcie (obserwatory notyfikacji)
 - [ ] SVN integration (zamiast statycznej sciezki do pliku)
