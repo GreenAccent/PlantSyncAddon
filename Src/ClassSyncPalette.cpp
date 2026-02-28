@@ -484,9 +484,9 @@ void ClassSyncPalette::LoadPreferences ()
 			xmlFilePath = GS::UniString (prefs.xmlPath, CC_UTF8);
 	}
 
-	// Fallback to default path
+	// Fallback to default path (master XML in repo)
 	if (xmlFilePath.IsEmpty ())
-		xmlFilePath = "C:\\Users\\Green\\claude\\Green Accent PLANTS.xml";
+		xmlFilePath = "C:\\Users\\Green\\claude\\PlantSyncAddon\\Green Accent PLANTS.xml";
 
 	ACAPI_WriteReport ("ClassSync: Loaded prefs, XML path = %s", false,
 					   xmlFilePath.ToCStr (0, MaxUSize, CC_UTF8).Get ());

@@ -4,15 +4,15 @@
 }
 
 'STR#' 32500 "Menu Strings" {
-/* [   ] */		"Options"
 /* [   ] */		"ClassSync"
-/* [  1] */		"ClassSync Palette"
+/* [   ] */		""
+/* [  1] */		"Sync"
 }
 
 'STR#' 32501 "Menu Prompts" {
-/* [   ] */		"Options"
 /* [   ] */		"ClassSync"
-/* [  1] */		"Toggle the ClassSync comparison palette"
+/* [   ] */		""
+/* [  1] */		"Open the ClassSync comparison palette"
 }
 
 'GDLG'  32600  Palette | close  0  0  960  560  "ClassSync" {

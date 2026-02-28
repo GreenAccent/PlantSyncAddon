@@ -28,10 +28,12 @@ static GSErrCode MenuCommandHandler (const API_MenuParams* menuParams)
 				ClassSyncPalette::CreateInstance ();
 				ClassSyncPalette::GetInstance ().Show ();
 			} else {
-				if (ClassSyncPalette::GetInstance ().IsVisible ())
+				if (ClassSyncPalette::GetInstance ().IsVisible ()) {
 					ClassSyncPalette::GetInstance ().Hide ();
-				else
+				} else {
 					ClassSyncPalette::GetInstance ().Show ();
+					ClassSyncPalette::GetInstance ().RefreshData ();
+				}
 			}
 			break;
 	}

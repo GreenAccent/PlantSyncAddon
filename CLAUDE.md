@@ -29,7 +29,7 @@ Wiecej kontekstu: `docs/project-context.md`
 - Developer ID: 860318800
 - PlantSync Local ID: 1954174874
 
-## Architektura add-onu (v0.4)
+## Architektura add-onu (v0.5)
 
 ### Struktura plikow
 ```
@@ -69,7 +69,7 @@ GSErrCode FreeData(void);                                // Save prefs + cleanup
 - 3 kolumny TreeView: Project | Differences | Server (XML)
 - 4 przyciski akcji: Import, Export, Use Project, Use Server
 - Browse button + preferences dla sciezki XML
-- Label wersji (v0.4)
+- Label wersji (v0.5)
 - Kolory: zielony (0,130,60)=nowe, niebieski (0,80,170)=brakujace, ceglasty (180,50,0)=konflikt
 - Singleton pattern, `BeginEventProcessing()`/`EndEventProcessing()`
 - `ACAPI_RegisterModelessWindow` z APIPalMsg_* callback
