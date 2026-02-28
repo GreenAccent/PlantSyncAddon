@@ -46,7 +46,8 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonClose        (GetReference (), ItemButtonClose)
 {
 	Attach (*this);
-	AttachToAllItems (*this);
+	buttonRefresh.Attach (*this);
+	buttonClose.Attach (*this);
 	BeginEventProcessing ();
 
 	RefreshData ();
@@ -60,7 +61,8 @@ ClassSyncPalette::ClassSyncPalette () :
 ClassSyncPalette::~ClassSyncPalette ()
 {
 	EndEventProcessing ();
-	DetachFromAllItems (*this);
+	buttonClose.Detach (*this);
+	buttonRefresh.Detach (*this);
 	Detach (*this);
 }
 
