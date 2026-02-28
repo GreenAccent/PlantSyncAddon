@@ -314,8 +314,35 @@ void ClassSyncPalette::ButtonClicked (const DG::ButtonClickEvent& ev)
 
 void ClassSyncPalette::TreeViewSelectionChanged (const DG::TreeViewSelectionEvent& ev)
 {
-	if (ev.GetSource () == &treeConflicts)
+	if (ev.GetSource () == &treeConflicts) {
 		UpdateActionButtons ();
+
+		// Sync selection in side trees
+		Int32 selected = treeConflicts.GetSelectedItem ();
+		UInt32 diffIdx;
+		if (selected != 0 && conflictItemToDiffIndex.Get (selected, &diffIdx))
+			SyncSideTreeSelection (diffEntries[diffIdx]);
+	}
+}
+
+
+// ---------------------------------------------------------------------------
+// Sync side tree selection: select and scroll to the matching item
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::SyncSideTreeSelection (const DiffEntry& entry)
+{
+	Int32 projItem = 0;
+	Int32 servItem = 0;
+
+	projectIdToTreeItem.Get (entry.id, &projItem);
+	serverIdToTreeItem.Get (entry.id, &servItem);
+
+	if (projItem != 0)
+		treeProject.SelectItem (projItem);
+
+	if (servItem != 0)
+		treeServer.SelectItem (servItem);
 }
 
 
@@ -614,7 +641,8 @@ void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 										   Int32 parentItem,
 										   UInt32& count,
 										   const GS::Array<DiffEntry>& diffs,
-										   TreeSide side)
+										   TreeSide side,
+										   GS::HashTable<GS::UniString, Int32>* idMap)
 {
 	for (UInt32 i = 0; i < nodes.GetSize (); i++) {
 		const ClassificationNode& node = nodes[i];
@@ -624,6 +652,10 @@ void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 		Int32 treeItem = tree.AppendItem (parentItem);
 		tree.SetItemText (treeItem, label);
 		count++;
+
+		// Store mapping for selection sync
+		if (idMap != nullptr)
+			idMap->Add (node.id, treeItem);
 
 		// Apply color based on diff status and which tree we're in
 		if (diffs.GetSize () > 0) {
@@ -646,7 +678,7 @@ void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 		}
 
 		// Recurse into children
-		FillTreeWithNodes (tree, node.children, treeItem, count, diffs, side);
+		FillTreeWithNodes (tree, node.children, treeItem, count, diffs, side, idMap);
 	}
 }
 
@@ -672,6 +704,7 @@ static void ClearTree (DG::SingleSelTreeView& tree, GS::Array<Int32>& rootItems)
 void ClassSyncPalette::PopulateProjectTree ()
 {
 	ClearTree (treeProject, projectRootItems);
+	projectIdToTreeItem.Clear ();
 	treeProject.DisableDraw ();
 
 	UInt32 itemCount = 0;
@@ -686,7 +719,7 @@ void ClassSyncPalette::PopulateProjectTree ()
 		treeProject.SetItemText (sysNode, sysLabel);
 		projectRootItems.Push (sysNode);
 
-		FillTreeWithNodes (treeProject, tree.rootItems, sysNode, itemCount, diffEntries, SideProject);
+		FillTreeWithNodes (treeProject, tree.rootItems, sysNode, itemCount, diffEntries, SideProject, &projectIdToTreeItem);
 		treeProject.ExpandItem (sysNode);
 	}
 
@@ -706,6 +739,7 @@ void ClassSyncPalette::PopulateProjectTree ()
 void ClassSyncPalette::PopulateServerTree ()
 {
 	ClearTree (treeServer, serverRootItems);
+	serverIdToTreeItem.Clear ();
 	treeServer.DisableDraw ();
 
 	UInt32 itemCount = 0;
@@ -720,7 +754,7 @@ void ClassSyncPalette::PopulateServerTree ()
 		treeServer.SetItemText (sysNode, sysLabel);
 		serverRootItems.Push (sysNode);
 
-		FillTreeWithNodes (treeServer, tree.rootItems, sysNode, itemCount, diffEntries, SideServer);
+		FillTreeWithNodes (treeServer, tree.rootItems, sysNode, itemCount, diffEntries, SideServer, &serverIdToTreeItem);
 		treeServer.ExpandItem (sysNode);
 	}
 

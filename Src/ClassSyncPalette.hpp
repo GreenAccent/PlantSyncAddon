@@ -121,10 +121,13 @@ private:
 									Int32 parentItem,
 									UInt32& count,
 									const GS::Array<DiffEntry>& diffs,
-									TreeSide side);
+									TreeSide side,
+									GS::HashTable<GS::UniString, Int32>* idMap);
 
 	static DiffStatus  FindDiffStatus (const GS::Array<DiffEntry>& diffs,
 									   const GS::UniString& id);
+
+	void  SyncSideTreeSelection (const DiffEntry& entry);
 
 	// Status
 	void  SetStatus (const GS::UniString& text);
@@ -171,6 +174,10 @@ private:
 
 	// Mapping: conflicts tree item ID -> index in diffEntries
 	GS::HashTable<Int32, UInt32>  conflictItemToDiffIndex;
+
+	// Mapping: classification ID string -> tree item ID (for selection sync)
+	GS::HashTable<GS::UniString, Int32>  projectIdToTreeItem;
+	GS::HashTable<GS::UniString, Int32>  serverIdToTreeItem;
 
 	// XML file path (loaded from preferences)
 	static GS::UniString  xmlFilePath;

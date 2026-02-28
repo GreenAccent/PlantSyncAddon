@@ -38,7 +38,7 @@
 - [ ] **Changelog / sledzenie zmian** - dodatek generuje log zmian: kto edytowal, co zmienil, kiedy; format do ustalenia (osobny plik changelog obok XML, lub sekcja w XML); identyfikacja usera (nazwa komputera / login Windows / konfigurowalny nick)
 
 ## Do zrobienia (v0.5 - UX)
-- [ ] **Synchronizacja selekcji** - klik na konflikcie (srodkowe drzewko) automatycznie przechodzi do odpowiedniego itemu w drzewku Project i Server, zeby nie trzeba bylo szukac reczne
+- [x] **Synchronizacja selekcji** - klik na konflikcie (srodkowe drzewko) automatycznie zaznacza odpowiedni item w drzewku Project i Server
 
 ## Do zrobienia (pozniej)
 - [x] Menu checkmark (zaznaczenie gdy paleta otwarta)
