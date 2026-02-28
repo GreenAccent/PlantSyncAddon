@@ -27,13 +27,13 @@ Wiecej kontekstu: `docs/project-context.md`
 
 ### Graphisoft Developer Registration
 - Developer ID: 860318800
-- PlantSync Local ID: 1954174874
+- ClassSync Local ID: 1954174874
 
 ## Architektura add-onu (v0.5)
 
 ### Struktura plikow
 ```
-PlantSyncAddon/
+ClassSyncAddon/
   CLAUDE.md                   # Ten plik
   CMakeLists.txt              # AC_ADDON_NAME "ClassSync", toolset v142, GLOB sources
   deploy.cmd                  # Kopiuje ClassSync.apx do Dodatki (UAC, czeka na zamkniecie AC)
@@ -46,9 +46,9 @@ PlantSyncAddon/
     XmlReader.hpp/cpp         # Parsowanie XML klasyfikacji z pliku na dysku
     XmlWriter.hpp/cpp         # Modyfikacja XML (ChangeItemName, AddItem)
   RFIX/
-    PlantSyncFix.grc          # MDID (860318800, 1954174874)
+    ClassSyncFix.grc          # MDID (860318800, 1954174874)
   RFIX.win/
-    PlantSync.rc2             # Windows resources master
+    ClassSync.rc2             # Windows resources master
   RINT/
     ClassSync.grc             # Stringi, menu, paleta (Palette | close, 960x560, 18 items)
   docs/

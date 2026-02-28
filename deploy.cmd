@@ -4,7 +4,6 @@
 
 set "SOURCE=%~dp0build\Release\ClassSync.apx"
 set "DEST=C:\Program Files\Graphisoft\Archicad 28\Dodatki\ClassSync.apx"
-set "OLD_ADDON=C:\Program Files\Graphisoft\Archicad 28\Dodatki\PlantSync.apx"
 
 if not exist "%SOURCE%" (
     echo ERROR: Cannot find %SOURCE%
@@ -27,10 +26,6 @@ if %errorlevel% == 0 (
 :: Check if running as admin
 net session >nul 2>&1
 if %errorlevel% == 0 (
-    if exist "%OLD_ADDON%" (
-        del /F "%OLD_ADDON%"
-        echo Removed old PlantSync.apx
-    )
     copy /Y "%SOURCE%" "%DEST%"
     if %errorlevel% == 0 (
         echo OK: Copied ClassSync.apx to Dodatki
@@ -41,6 +36,6 @@ if %errorlevel% == 0 (
     exit /b %errorlevel%
 )
 
-:: Re-launch as admin (with wait loop built in)
+:: Re-launch as admin
 echo Elevating privileges...
-powershell -Command "Start-Process cmd -ArgumentList '/c echo Waiting for Archicad.exe... && powershell -Command \"while (Get-Process Archicad -ErrorAction SilentlyContinue) { Start-Sleep 2 }\" && echo Archicad closed. && if exist \"%OLD_ADDON%\" (del /F \"%OLD_ADDON%\" && echo Removed old PlantSync.apx) && copy /Y \"%SOURCE%\" \"%DEST%\" && echo OK: Copied ClassSync.apx && pause' -Verb RunAs"
+powershell -Command "Start-Process cmd -ArgumentList '/c copy /Y \"%SOURCE%\" \"%DEST%\" && echo OK: Copied ClassSync.apx && pause' -Verb RunAs"

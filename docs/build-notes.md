@@ -33,7 +33,7 @@ deploy.cmd
 ```
 - Waits for Archicad.exe to close (polling co 2s)
 - Elevates to admin via UAC (PowerShell Start-Process -Verb RunAs)
-- Removes old PlantSync.apx if exists
+- Removes old ClassSync.apx if exists
 - Copies ClassSync.apx to `C:\Program Files\GRAPHISOFT\Archicad 28\Dodatki\`
 
 ## Common Build Errors Encountered

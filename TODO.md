@@ -29,7 +29,7 @@
 - [ ] **Edytor obiektow (panel properties)** - po zaznaczeniu itemu w drzewku Project lub Server wyswietlic jego wlasciwosci w panelu edycyjnym; mozliwosc recznej edycji; przy zaznaczeniu konfliktu (srodkowe drzewko) edytor nieaktywny (dotyczy dwoch obiektow)
 - [ ] **Resize + zapamietywanie rozmiaru** - Palette | grow, proporcjonalny 3-kolumnowy layout, rozmiar zapisywany w preferencjach
 - [ ] **Status/postep wczytywania** - wskaznik ze trwa wczytywanie XML z serwera / danych z projektu; duze pliki moga dlugo trwac
-- [ ] **Rename na ClassSync** - nazwa dodatku, katalog, repo, wszystkie pliki i referencje
+- [x] **Rename na ClassSync** - pliki zasobow, referencje, deploy.cmd, README, docs
 - [x] **Menu: "ClassSync" > "Sync"** - menu "ClassSync" z opcja "Sync"
 
 ## Do zrobienia (v0.5 - krytyczne)

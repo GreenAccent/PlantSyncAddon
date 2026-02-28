@@ -200,5 +200,5 @@ Self-closing `<Children/>` = leaf item (no children).
 ## MDID
 - Developer ID: 860318800
 - Authorization Key: VCMXXGWYMZV3XXQK
-- PlantSync Local ID: 1954174874
+- ClassSync Local ID: 1954174874
 - Portal: https://archicadapi.graphisoft.com/
