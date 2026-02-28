@@ -97,3 +97,11 @@ deploy.cmd
 - MSVC /MD, _ITERATOR_DEBUG_LEVEL=0
 - Po dodaniu nowych plikow .cpp/.hpp: re-run cmake configure (GLOB)
 - Preferencje: ACAPI_SetPreferences/GetPreferences z struct ClassSyncPrefs
+
+### Znane pulapki (gotchas)
+- DG::Palette: uzywac indywidualnych button.Attach(*this), NIE AttachToAllItems (wymaga CompoundItemObserver)
+- TreeView redraw: wywolac tree.Redraw() po tree.EnableDraw() - inaczej drzewko sie nie odswiezy
+- CMake GLOB: po dodaniu nowych plikow .cpp/.hpp TRZEBA re-run cmake configure
+- API typo: `API_SkipConflicitingItems` (nie "Conflicting") - literowka w oficjalnym API
+- deploy.cmd: wymaga recznego uruchomienia z admin, UAC nie dziala dobrze z basha
+- XML parser: szukanie tagu <Children> musi byc nesting-aware (FindMatchingClose)
