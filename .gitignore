@@ -2,6 +2,7 @@
 build/
 out/
 cmake-build-*/
+releases/
 *.apx
 *.res
 *.obj
