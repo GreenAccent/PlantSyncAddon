@@ -60,6 +60,9 @@ GSErrCode RegisterInterface (void)
 
 GSErrCode Initialize (void)
 {
+	// Load saved preferences (XML path)
+	ClassSyncPalette::LoadPreferences ();
+
 	GSErrCode err;
 
 	err = ACAPI_MenuItem_InstallMenuHandler (32500, MenuCommandHandler);
@@ -79,6 +82,9 @@ GSErrCode Initialize (void)
 
 GSErrCode FreeData (void)
 {
+	// Save preferences before cleanup
+	ClassSyncPalette::SavePreferences ();
+
 	if (ClassSyncPalette::HasInstance ())
 		ClassSyncPalette::DestroyInstance ();
 

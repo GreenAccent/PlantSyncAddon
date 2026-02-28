@@ -15,18 +15,25 @@
 /* [  1] */		"Toggle the ClassSync comparison palette"
 }
 
-'GDLG'  32600  Palette | close  0  0  960  520  "ClassSync" {
+'GDLG'  32600  Palette | close  0  0  960  560  "ClassSync" {
 /* [  1] */ LeftText              10    5  300   16  LargePlain  "Project"
-/* [  2] */ LeftText             325    5  300   16  LargePlain  "Conflicts"
-/* [  3] */ LeftText             640    5  300   16  LargePlain  "Server"
-/* [  4] */ SingleSelTreeView     10   25  300  440  LargePlain  16  16  18  15  noLabelEdit  noDragDrop  0
-/* [  5] */ SingleSelTreeView    325   25  300  440  LargePlain  16  16  18  15  noLabelEdit  noDragDrop  0
-/* [  6] */ SingleSelTreeView    640   25  300  440  LargePlain  16  16  18  15  noLabelEdit  noDragDrop  0
-/* [  7] */ LeftText              10  470  300   16  LargePlain  ""
-/* [  8] */ LeftText             325  470  300   16  LargePlain  ""
-/* [  9] */ LeftText             640  470  300   16  LargePlain  ""
-/* [ 10] */ Button               760  490   90   25  LargePlain  "Refresh"
-/* [ 11] */ Button               860  490   90   25  LargePlain  "Close"
+/* [  2] */ LeftText             325    5  300   16  LargePlain  "Differences"
+/* [  3] */ LeftText             640    5  300   16  LargePlain  "Server (XML)"
+/* [  4] */ SingleSelTreeView     10   25  300  380  LargePlain  16  16  18  15  noLabelEdit  noDragDrop  0
+/* [  5] */ SingleSelTreeView    325   25  300  380  LargePlain  16  16  18  15  noLabelEdit  noDragDrop  0
+/* [  6] */ SingleSelTreeView    640   25  300  380  LargePlain  16  16  18  15  noLabelEdit  noDragDrop  0
+/* [  7] */ LeftText              10  410  300   16  LargePlain  ""
+/* [  8] */ LeftText             325  410  300   16  LargePlain  ""
+/* [  9] */ LeftText             640  410  300   16  LargePlain  ""
+/* [ 10] */ Button               760  530   90   25  LargePlain  "Refresh"
+/* [ 11] */ Button               860  530   90   25  LargePlain  "Close"
+/* [ 12] */ LeftText              10  432  750   16  SmallPlain  ""
+/* [ 13] */ Button               770  430   90   20  SmallPlain  "Browse..."
+/* [ 14] */ Button                10  460  110   25  LargePlain  "<- Import"
+/* [ 15] */ Button               125  460  110   25  LargePlain  "Export ->"
+/* [ 16] */ Button               250  460  110   25  LargePlain  "Use Project"
+/* [ 17] */ Button               365  460  110   25  LargePlain  "Use Server"
+/* [ 18] */ LeftText              10  535  200   16  SmallPlain  ""
 }
 
 'DLGH'  32600  ClassSyncPaletteDialog {
@@ -41,4 +48,11 @@
 9	""	CountServer
 10	""	ButtonRefresh
 11	""	ButtonClose
+12	""	LabelXmlPath
+13	""	ButtonBrowse
+14	""	ButtonImport
+15	""	ButtonExport
+16	""	ButtonUseProject
+17	""	ButtonUseServer
+18	""	LabelVersion
 }

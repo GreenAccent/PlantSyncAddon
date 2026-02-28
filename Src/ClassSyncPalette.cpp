@@ -1,5 +1,10 @@
 #include "ClassSyncPalette.hpp"
 #include "XmlReader.hpp"
+#include "XmlWriter.hpp"
+#include "DGFileDlg.hpp"
+
+#include <fstream>
+#include <sstream>
 
 
 // ---------------------------------------------------------------------------
@@ -15,15 +20,16 @@ static const GS::Guid kPaletteGuid ("C1A55710-DA7A-4B2E-9F3C-8E2D1A6B5C4E");
 
 ClassSyncPalette*  ClassSyncPalette::instance          = nullptr;
 bool               ClassSyncPalette::wasOpenBeforeHide = false;
+GS::UniString      ClassSyncPalette::xmlFilePath;
 
 
 // ---------------------------------------------------------------------------
-// Color constants
+// Color constants (muted, 3-color scheme)
 // ---------------------------------------------------------------------------
 
-static const Gfx::Color kColorConflict     (200,   0,   0);    // red
-static const Gfx::Color kColorOnlyProject  (200, 120,   0);    // orange
-static const Gfx::Color kColorOnlyServer   (  0, 100, 200);    // blue
+static const Gfx::Color kColorNew      (  0, 130,  60);   // dark green  - unique to this side
+static const Gfx::Color kColorMissing  (  0,  80, 170);   // dark blue   - missing (exists on other side)
+static const Gfx::Color kColorConflict (180,  50,   0);   // brick red   - conflict (same ID, different name)
 
 
 // ---------------------------------------------------------------------------
@@ -43,14 +49,45 @@ ClassSyncPalette::ClassSyncPalette () :
 	countConflicts     (GetReference (), ItemCountConflicts),
 	countServer        (GetReference (), ItemCountServer),
 	buttonRefresh      (GetReference (), ItemButtonRefresh),
-	buttonClose        (GetReference (), ItemButtonClose)
+	buttonClose        (GetReference (), ItemButtonClose),
+	labelXmlPath       (GetReference (), ItemLabelXmlPath),
+	buttonBrowse       (GetReference (), ItemButtonBrowse),
+	buttonImport       (GetReference (), ItemButtonImport),
+	buttonExport       (GetReference (), ItemButtonExport),
+	buttonUseProject   (GetReference (), ItemButtonUseProject),
+	buttonUseServer    (GetReference (), ItemButtonUseServer),
+	labelVersion       (GetReference (), ItemLabelVersion)
 {
 	Attach (*this);
 	buttonRefresh.Attach (*this);
 	buttonClose.Attach (*this);
+	buttonBrowse.Attach (*this);
+	buttonImport.Attach (*this);
+	buttonExport.Attach (*this);
+	buttonUseProject.Attach (*this);
+	buttonUseServer.Attach (*this);
+	treeConflicts.Attach (static_cast<DG::TreeViewObserver&> (*this));
 	BeginEventProcessing ();
 
-	RefreshData ();
+	// Version label
+	labelVersion.SetText (GS::UniString ("v") + kClassSyncVersion);
+
+	// XML path label
+	if (!xmlFilePath.IsEmpty ())
+		labelXmlPath.SetText (xmlFilePath);
+	else
+		labelXmlPath.SetText ("No XML file selected - click Browse...");
+
+	// Disable action buttons initially
+	buttonImport.Disable ();
+	buttonExport.Disable ();
+	buttonUseProject.Disable ();
+	buttonUseServer.Disable ();
+
+	ACAPI_WriteReport ("ClassSync v%s started", false, kClassSyncVersion);
+
+	if (!xmlFilePath.IsEmpty ())
+		RefreshData ();
 }
 
 
@@ -61,6 +98,12 @@ ClassSyncPalette::ClassSyncPalette () :
 ClassSyncPalette::~ClassSyncPalette ()
 {
 	EndEventProcessing ();
+	treeConflicts.Detach (static_cast<DG::TreeViewObserver&> (*this));
+	buttonUseServer.Detach (*this);
+	buttonUseProject.Detach (*this);
+	buttonExport.Detach (*this);
+	buttonImport.Detach (*this);
+	buttonBrowse.Detach (*this);
 	buttonClose.Detach (*this);
 	buttonRefresh.Detach (*this);
 	Detach (*this);
@@ -170,7 +213,299 @@ void ClassSyncPalette::ButtonClicked (const DG::ButtonClickEvent& ev)
 		RefreshData ();
 	} else if (ev.GetSource () == &buttonClose) {
 		Hide ();
+	} else if (ev.GetSource () == &buttonBrowse) {
+		BrowseForXml ();
+	} else if (ev.GetSource () == &buttonImport) {
+		DoImportFromServer ();
+	} else if (ev.GetSource () == &buttonExport) {
+		DoExportToServer ();
+	} else if (ev.GetSource () == &buttonUseProject) {
+		DoUseProject ();
+	} else if (ev.GetSource () == &buttonUseServer) {
+		DoUseServer ();
 	}
+}
+
+
+// ---------------------------------------------------------------------------
+// TreeViewObserver: selection changed in conflicts tree
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::TreeViewSelectionChanged (const DG::TreeViewSelectionEvent& ev)
+{
+	if (ev.GetSource () == &treeConflicts)
+		UpdateActionButtons ();
+}
+
+
+// ---------------------------------------------------------------------------
+// Update action button enabled states based on conflicts tree selection
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::UpdateActionButtons ()
+{
+	Int32 selected = treeConflicts.GetSelectedItem ();
+
+	if (selected == 0 || selected == DG::TreeView::RootItem) {
+		buttonImport.Disable ();
+		buttonExport.Disable ();
+		buttonUseProject.Disable ();
+		buttonUseServer.Disable ();
+		return;
+	}
+
+	UInt32 diffIdx;
+	if (!conflictItemToDiffIndex.Get (selected, &diffIdx)) {
+		// Section header or non-actionable item
+		buttonImport.Disable ();
+		buttonExport.Disable ();
+		buttonUseProject.Disable ();
+		buttonUseServer.Disable ();
+		return;
+	}
+
+	const DiffEntry& entry = diffEntries[diffIdx];
+
+	buttonImport.Disable ();
+	buttonExport.Disable ();
+	buttonUseProject.Disable ();
+	buttonUseServer.Disable ();
+
+	switch (entry.status) {
+		case DiffStatus::OnlyInServer:
+			buttonImport.Enable ();
+			break;
+		case DiffStatus::OnlyInProject:
+			buttonExport.Enable ();
+			break;
+		case DiffStatus::Conflict:
+			buttonUseProject.Enable ();
+			buttonUseServer.Enable ();
+			break;
+		default:
+			break;
+	}
+}
+
+
+// ---------------------------------------------------------------------------
+// Browse for XML file
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::BrowseForXml ()
+{
+	DGTypePopupItem popup;
+	popup.text = "XML Files (*.xml)";
+	popup.extensions = "xml";
+
+	IO::Location loc;
+	bool success = DGGetOpenFile (&loc, 1, &popup, nullptr,
+								  GS::UniString ("Select Classification XML"));
+
+	if (success) {
+		xmlFilePath = loc.ToDisplayText ();
+		labelXmlPath.SetText (xmlFilePath);
+		SavePreferences ();
+		RefreshData ();
+	}
+}
+
+
+// ---------------------------------------------------------------------------
+// Import from server: add all missing items to project using XML import
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::DoImportFromServer ()
+{
+	if (xmlFilePath.IsEmpty ()) return;
+
+	std::string pathUtf8 (xmlFilePath.ToCStr (0, MaxUSize, CC_UTF8).Get ());
+
+	std::ifstream file (pathUtf8, std::ios::binary);
+	if (!file.is_open ()) {
+		ACAPI_WriteReport ("ClassSync: Cannot open XML for import: %s", false, pathUtf8.c_str ());
+		return;
+	}
+	std::ostringstream ss;
+	ss << file.rdbuf ();
+	std::string content = ss.str ();
+	file.close ();
+
+	GS::UniString xmlContent (content.c_str (), CC_UTF8);
+
+	GSErrCode err = ACAPI_CallUndoableCommand (
+		GS::UniString ("ClassSync: Import from Server"),
+		[&] () -> GSErrCode {
+			return ACAPI_Classification_Import (
+				xmlContent,
+				API_MergeConflictingSystems,
+				API_SkipConflicitingItems);
+		});
+
+	if (err == NoError)
+		ACAPI_WriteReport ("ClassSync: Import successful", false);
+	else
+		ACAPI_WriteReport ("ClassSync: Import failed, error %d", false, (int)err);
+
+	RefreshData ();
+}
+
+
+// ---------------------------------------------------------------------------
+// Export to server: add selected OnlyInProject item to XML file
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::DoExportToServer ()
+{
+	if (xmlFilePath.IsEmpty ()) return;
+
+	Int32 selected = treeConflicts.GetSelectedItem ();
+	UInt32 diffIdx;
+	if (!conflictItemToDiffIndex.Get (selected, &diffIdx)) return;
+
+	const DiffEntry& entry = diffEntries[diffIdx];
+	if (entry.status != DiffStatus::OnlyInProject) return;
+
+	ClassificationNode node;
+	node.id          = entry.id;
+	node.name        = entry.projectName;
+	node.description = entry.description;
+	node.guid        = APINULLGuid;
+
+	std::string pathUtf8 (xmlFilePath.ToCStr (0, MaxUSize, CC_UTF8).Get ());
+
+	// Determine parent ID: strip last segment from the item ID
+	// e.g. "DRZ.L.01.03" -> parent is "DRZ.L.01", "DRZ.L" -> parent is "DRZ"
+	GS::UniString parentId;
+	auto lastDot = entry.id.FindLast ('.');
+	if (lastDot != MaxUIndex)
+		parentId = entry.id.GetSubstring (0, lastDot);
+
+	bool success = AddItemToXml (pathUtf8.c_str (), parentId, node);
+
+	if (success)
+		ACAPI_WriteReport ("ClassSync: Exported '%s' to XML", false,
+						   entry.id.ToCStr ().Get ());
+	else
+		ACAPI_WriteReport ("ClassSync: Export failed for '%s'", false,
+						   entry.id.ToCStr ().Get ());
+
+	RefreshData ();
+}
+
+
+// ---------------------------------------------------------------------------
+// Use Project: update XML item name to match project
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::DoUseProject ()
+{
+	if (xmlFilePath.IsEmpty ()) return;
+
+	Int32 selected = treeConflicts.GetSelectedItem ();
+	UInt32 diffIdx;
+	if (!conflictItemToDiffIndex.Get (selected, &diffIdx)) return;
+
+	const DiffEntry& entry = diffEntries[diffIdx];
+	if (entry.status != DiffStatus::Conflict) return;
+
+	std::string pathUtf8 (xmlFilePath.ToCStr (0, MaxUSize, CC_UTF8).Get ());
+
+	bool success = ChangeItemNameInXml (pathUtf8.c_str (), entry.id, entry.projectName);
+
+	if (success)
+		ACAPI_WriteReport ("ClassSync: XML updated - '%s' name -> '%s'", false,
+						   entry.id.ToCStr ().Get (),
+						   entry.projectName.ToCStr ().Get ());
+	else
+		ACAPI_WriteReport ("ClassSync: Failed to update XML for '%s'", false,
+						   entry.id.ToCStr ().Get ());
+
+	RefreshData ();
+}
+
+
+// ---------------------------------------------------------------------------
+// Use Server: update project item name to match server
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::DoUseServer ()
+{
+	Int32 selected = treeConflicts.GetSelectedItem ();
+	UInt32 diffIdx;
+	if (!conflictItemToDiffIndex.Get (selected, &diffIdx)) return;
+
+	const DiffEntry& entry = diffEntries[diffIdx];
+	if (entry.status != DiffStatus::Conflict) return;
+	if (entry.projectItemGuid == APINULLGuid) return;
+
+	API_ClassificationItem item;
+	item.guid = entry.projectItemGuid;
+	if (ACAPI_Classification_GetClassificationItem (item) != NoError) {
+		ACAPI_WriteReport ("ClassSync: Cannot find project item '%s'", false,
+						   entry.id.ToCStr ().Get ());
+		return;
+	}
+
+	item.name = entry.serverName;
+
+	GSErrCode err = ACAPI_CallUndoableCommand (
+		GS::UniString ("ClassSync: Use Server name"),
+		[&] () -> GSErrCode {
+			return ACAPI_Classification_ChangeClassificationItem (item);
+		});
+
+	if (err == NoError)
+		ACAPI_WriteReport ("ClassSync: Project item '%s' name -> '%s'", false,
+						   entry.id.ToCStr ().Get (),
+						   entry.serverName.ToCStr ().Get ());
+	else
+		ACAPI_WriteReport ("ClassSync: Failed to change project item '%s', error %d", false,
+						   entry.id.ToCStr ().Get (), (int)err);
+
+	RefreshData ();
+}
+
+
+// ---------------------------------------------------------------------------
+// Preferences: load
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::LoadPreferences ()
+{
+	Int32 version = 0;
+	GSSize nByte = 0;
+	ACAPI_GetPreferences (&version, &nByte, nullptr);
+
+	if (version == kPrefsVersion && nByte == sizeof (ClassSyncPrefs)) {
+		ClassSyncPrefs prefs = {};
+		ACAPI_GetPreferences (&version, &nByte, &prefs);
+		if (prefs.xmlPath[0] != '\0')
+			xmlFilePath = GS::UniString (prefs.xmlPath, CC_UTF8);
+	}
+
+	// Fallback to default path
+	if (xmlFilePath.IsEmpty ())
+		xmlFilePath = "C:\\Users\\Green\\claude\\Green Accent PLANTS.xml";
+
+	ACAPI_WriteReport ("ClassSync: Loaded prefs, XML path = %s", false,
+					   xmlFilePath.ToCStr (0, MaxUSize, CC_UTF8).Get ());
+}
+
+
+// ---------------------------------------------------------------------------
+// Preferences: save
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::SavePreferences ()
+{
+	ClassSyncPrefs prefs = {};
+	prefs.platform = GS::Win_Platform_Sign;
+
+	std::string pathUtf8 (xmlFilePath.ToCStr (0, MaxUSize, CC_UTF8).Get ());
+	strncpy (prefs.xmlPath, pathUtf8.c_str (), sizeof (prefs.xmlPath) - 1);
+
+	ACAPI_SetPreferences (kPrefsVersion, sizeof (ClassSyncPrefs), &prefs);
 }
 
 
@@ -190,14 +525,15 @@ DiffStatus ClassSyncPalette::FindDiffStatus (const GS::Array<DiffEntry>& diffs,
 
 
 // ---------------------------------------------------------------------------
-// Helper: recursively fill tree with nodes + apply diff colors
+// Helper: recursively fill tree with nodes + context-sensitive colors
 // ---------------------------------------------------------------------------
 
 void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 										   const GS::Array<ClassificationNode>& nodes,
 										   Int32 parentItem,
 										   UInt32& count,
-										   const GS::Array<DiffEntry>& diffs)
+										   const GS::Array<DiffEntry>& diffs,
+										   TreeSide side)
 {
 	for (UInt32 i = 0; i < nodes.GetSize (); i++) {
 		const ClassificationNode& node = nodes[i];
@@ -208,18 +544,20 @@ void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 		tree.SetItemText (treeItem, label);
 		count++;
 
-		// Apply color based on diff status
+		// Apply color based on diff status and which tree we're in
 		if (diffs.GetSize () > 0) {
 			DiffStatus st = FindDiffStatus (diffs, node.id);
 			switch (st) {
-				case DiffStatus::Conflict:
-					tree.SetItemTextColor (treeItem, kColorConflict);
-					break;
 				case DiffStatus::OnlyInProject:
-					tree.SetItemTextColor (treeItem, kColorOnlyProject);
+					if (side == SideProject)
+						tree.SetItemTextColor (treeItem, kColorNew);       // green: unique to project
 					break;
 				case DiffStatus::OnlyInServer:
-					tree.SetItemTextColor (treeItem, kColorOnlyServer);
+					if (side == SideServer)
+						tree.SetItemTextColor (treeItem, kColorNew);       // green: unique to server
+					break;
+				case DiffStatus::Conflict:
+					tree.SetItemTextColor (treeItem, kColorConflict);      // brick red: conflict
 					break;
 				default:
 					break;
@@ -227,7 +565,7 @@ void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 		}
 
 		// Recurse into children
-		FillTreeWithNodes (tree, node.children, treeItem, count, diffs);
+		FillTreeWithNodes (tree, node.children, treeItem, count, diffs, side);
 	}
 }
 
@@ -267,11 +605,12 @@ void ClassSyncPalette::PopulateProjectTree ()
 		treeProject.SetItemText (sysNode, sysLabel);
 		projectRootItems.Push (sysNode);
 
-		FillTreeWithNodes (treeProject, tree.rootItems, sysNode, itemCount, diffEntries);
+		FillTreeWithNodes (treeProject, tree.rootItems, sysNode, itemCount, diffEntries, SideProject);
 		treeProject.ExpandItem (sysNode);
 	}
 
 	treeProject.EnableDraw ();
+	treeProject.Redraw ();
 
 	GS::UniString status = GS::UniString::Printf ("%d systems, %d items",
 		sysCount, itemCount);
@@ -300,11 +639,12 @@ void ClassSyncPalette::PopulateServerTree ()
 		treeServer.SetItemText (sysNode, sysLabel);
 		serverRootItems.Push (sysNode);
 
-		FillTreeWithNodes (treeServer, tree.rootItems, sysNode, itemCount, diffEntries);
+		FillTreeWithNodes (treeServer, tree.rootItems, sysNode, itemCount, diffEntries, SideServer);
 		treeServer.ExpandItem (sysNode);
 	}
 
 	treeServer.EnableDraw ();
+	treeServer.Redraw ();
 
 	GS::UniString status = GS::UniString::Printf ("%d systems, %d items",
 		sysCount, itemCount);
@@ -319,6 +659,7 @@ void ClassSyncPalette::PopulateServerTree ()
 void ClassSyncPalette::PopulateConflictsTree ()
 {
 	ClearTree (treeConflicts, conflictRootItems);
+	conflictItemToDiffIndex.Clear ();
 	treeConflicts.DisableDraw ();
 
 	// Count by status
@@ -342,6 +683,7 @@ void ClassSyncPalette::PopulateConflictsTree ()
 		treeConflicts.SetItemText (item, "All items match");
 		conflictRootItems.Push (item);
 		treeConflicts.EnableDraw ();
+		treeConflicts.Redraw ();
 		countConflicts.SetText ("0 differences");
 		return;
 	}
@@ -350,7 +692,7 @@ void ClassSyncPalette::PopulateConflictsTree ()
 	if (conflictCount > 0) {
 		Int32 secItem = treeConflicts.AppendItem (DG_TVI_ROOT);
 		treeConflicts.SetItemText (secItem,
-			GS::UniString::Printf ("Name Conflicts (%d)", conflictCount));
+			GS::UniString::Printf ("Conflicts (%d)", conflictCount));
 		treeConflicts.SetItemTextColor (secItem, kColorConflict);
 		conflictRootItems.Push (secItem);
 
@@ -358,10 +700,11 @@ void ClassSyncPalette::PopulateConflictsTree ()
 			if (diffEntries[i].status == DiffStatus::Conflict) {
 				Int32 child = treeConflicts.AppendItem (secItem);
 				GS::UniString label = diffEntries[i].id
-					+ "  P: " + diffEntries[i].projectName
-					+ "  S: " + diffEntries[i].serverName;
+					+ "  P:\"" + diffEntries[i].projectName
+					+ "\"  S:\"" + diffEntries[i].serverName + "\"";
 				treeConflicts.SetItemText (child, label);
 				treeConflicts.SetItemTextColor (child, kColorConflict);
+				conflictItemToDiffIndex.Add (child, i);
 			}
 		}
 		treeConflicts.ExpandItem (secItem);
@@ -372,7 +715,7 @@ void ClassSyncPalette::PopulateConflictsTree ()
 		Int32 secItem = treeConflicts.AppendItem (DG_TVI_ROOT);
 		treeConflicts.SetItemText (secItem,
 			GS::UniString::Printf ("Only in Project (%d)", onlyProjCount));
-		treeConflicts.SetItemTextColor (secItem, kColorOnlyProject);
+		treeConflicts.SetItemTextColor (secItem, kColorNew);
 		conflictRootItems.Push (secItem);
 
 		for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
@@ -380,7 +723,8 @@ void ClassSyncPalette::PopulateConflictsTree ()
 				Int32 child = treeConflicts.AppendItem (secItem);
 				GS::UniString label = diffEntries[i].id + "  -  " + diffEntries[i].projectName;
 				treeConflicts.SetItemText (child, label);
-				treeConflicts.SetItemTextColor (child, kColorOnlyProject);
+				treeConflicts.SetItemTextColor (child, kColorNew);
+				conflictItemToDiffIndex.Add (child, i);
 			}
 		}
 		treeConflicts.ExpandItem (secItem);
@@ -391,7 +735,7 @@ void ClassSyncPalette::PopulateConflictsTree ()
 		Int32 secItem = treeConflicts.AppendItem (DG_TVI_ROOT);
 		treeConflicts.SetItemText (secItem,
 			GS::UniString::Printf ("Only on Server (%d)", onlyServCount));
-		treeConflicts.SetItemTextColor (secItem, kColorOnlyServer);
+		treeConflicts.SetItemTextColor (secItem, kColorMissing);
 		conflictRootItems.Push (secItem);
 
 		for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
@@ -399,13 +743,15 @@ void ClassSyncPalette::PopulateConflictsTree ()
 				Int32 child = treeConflicts.AppendItem (secItem);
 				GS::UniString label = diffEntries[i].id + "  -  " + diffEntries[i].serverName;
 				treeConflicts.SetItemText (child, label);
-				treeConflicts.SetItemTextColor (child, kColorOnlyServer);
+				treeConflicts.SetItemTextColor (child, kColorMissing);
+				conflictItemToDiffIndex.Add (child, i);
 			}
 		}
 		treeConflicts.ExpandItem (secItem);
 	}
 
 	treeConflicts.EnableDraw ();
+	treeConflicts.Redraw ();
 
 	GS::UniString status = GS::UniString::Printf ("%d differences", totalDiffs);
 	countConflicts.SetText (status);
@@ -418,14 +764,22 @@ void ClassSyncPalette::PopulateConflictsTree ()
 
 void ClassSyncPalette::RefreshData ()
 {
-	ACAPI_WriteReport ("ClassSync: RefreshData starting...", false);
-	ACAPI_WriteReport ("ClassSync: XML path = %s", false, kDefaultXmlPath);
+	if (xmlFilePath.IsEmpty ()) {
+		ACAPI_WriteReport ("ClassSync: No XML path set", false);
+		countServer.SetText ("No XML file");
+		return;
+	}
+
+	std::string pathUtf8 (xmlFilePath.ToCStr (0, MaxUSize, CC_UTF8).Get ());
+
+	ACAPI_WriteReport ("ClassSync v%s: RefreshData starting...", false, kClassSyncVersion);
+	ACAPI_WriteReport ("ClassSync: XML path = %s", false, pathUtf8.c_str ());
 
 	// Read data
 	projectData = ReadProjectClassifications ();
 	ACAPI_WriteReport ("ClassSync: Project: %d systems", false, (int)projectData.GetSize ());
 
-	serverData  = ReadXmlClassifications (kDefaultXmlPath);
+	serverData  = ReadXmlClassifications (pathUtf8.c_str ());
 	ACAPI_WriteReport ("ClassSync: Server: %d systems", false, (int)serverData.GetSize ());
 
 	// Run diff
@@ -447,6 +801,7 @@ void ClassSyncPalette::RefreshData ()
 	PopulateProjectTree ();
 	PopulateServerTree ();
 	PopulateConflictsTree ();
+	UpdateActionButtons ();
 
 	ACAPI_WriteReport ("ClassSync: RefreshData done.", false);
 }

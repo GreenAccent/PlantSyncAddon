@@ -74,12 +74,13 @@ PlantSyncAddon/
     ClassSyncPalette.hpp/cpp  # DG::Palette z 3 TreeViews (Project/Conflicts/Server)
     ClassificationData.hpp/cpp # Model danych + odczyt z projektu + algorytm diff
     XmlReader.hpp/cpp         # Parsowanie XML klasyfikacji z pliku na dysku
+    XmlWriter.hpp/cpp         # Modyfikacja XML (ChangeItemName, AddItem)
   RFIX/
     PlantSyncFix.grc          # MDID (860318800, 1954174874)
   RFIX.win/
     PlantSync.rc2             # Windows resources master
   RINT/
-    ClassSync.grc             # Stringi, menu, paleta (Palette | close, 960x520, 11 items)
+    ClassSync.grc             # Stringi, menu, paleta (Palette | close, 960x560, 18 items)
 ```
 
 ### Wymagane 4 funkcje (eksportowane przez ACAP_STAT.lib)

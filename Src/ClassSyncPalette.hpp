@@ -5,7 +5,27 @@
 #include "ACAPinc.h"
 #include "DGModule.hpp"
 #include "Color.hpp"
+#include "HashTable.hpp"
 #include "ClassificationData.hpp"
+
+
+// ---------------------------------------------------------------------------
+// Version
+// ---------------------------------------------------------------------------
+
+static const char* kClassSyncVersion = "0.4";
+
+
+// ---------------------------------------------------------------------------
+// Preferences structure
+// ---------------------------------------------------------------------------
+
+struct ClassSyncPrefs {
+	unsigned short  platform;
+	char            xmlPath[1024];
+};
+
+static const Int32 kPrefsVersion = 1;
 
 
 // ---------------------------------------------------------------------------
@@ -15,25 +35,35 @@
 enum {
 	ClassSyncPaletteResId = 32600,
 
-	ItemLabelProject    = 1,
-	ItemLabelConflicts  = 2,
-	ItemLabelServer     = 3,
-	ItemTreeProject     = 4,
-	ItemTreeConflicts   = 5,
-	ItemTreeServer      = 6,
-	ItemCountProject    = 7,
-	ItemCountConflicts  = 8,
-	ItemCountServer     = 9,
-	ItemButtonRefresh   = 10,
-	ItemButtonClose     = 11
+	ItemLabelProject     = 1,
+	ItemLabelConflicts   = 2,
+	ItemLabelServer      = 3,
+	ItemTreeProject      = 4,
+	ItemTreeConflicts    = 5,
+	ItemTreeServer       = 6,
+	ItemCountProject     = 7,
+	ItemCountConflicts   = 8,
+	ItemCountServer      = 9,
+	ItemButtonRefresh    = 10,
+	ItemButtonClose      = 11,
+	ItemLabelXmlPath     = 12,
+	ItemButtonBrowse     = 13,
+	ItemButtonImport     = 14,
+	ItemButtonExport     = 15,
+	ItemButtonUseProject = 16,
+	ItemButtonUseServer  = 17,
+	ItemLabelVersion     = 18
 };
 
 
 // ---------------------------------------------------------------------------
-// Default XML path (hardcoded for now)
+// Which tree is being populated (for context-sensitive coloring)
 // ---------------------------------------------------------------------------
 
-static const char* kDefaultXmlPath = "C:\\Users\\Green\\claude\\Green Accent PLANTS.xml";
+enum TreeSide {
+	SideProject,
+	SideServer
+};
 
 
 // ---------------------------------------------------------------------------
@@ -42,7 +72,8 @@ static const char* kDefaultXmlPath = "C:\\Users\\Green\\claude\\Green Accent PLA
 
 class ClassSyncPalette : public DG::Palette,
 						 public DG::PanelObserver,
-						 public DG::ButtonItemObserver
+						 public DG::ButtonItemObserver,
+						 public DG::TreeViewObserver
 {
 public:
 	ClassSyncPalette ();
@@ -65,12 +96,19 @@ public:
 	// Refresh all data
 	void  RefreshData ();
 
+	// Preferences
+	static void  LoadPreferences ();
+	static void  SavePreferences ();
+
 private:
 	// DG::PanelObserver
 	virtual void  PanelCloseRequested (const DG::PanelCloseRequestEvent& ev, bool* accepted) override;
 
 	// DG::ButtonItemObserver
 	virtual void  ButtonClicked (const DG::ButtonClickEvent& ev) override;
+
+	// DG::TreeViewObserver
+	virtual void  TreeViewSelectionChanged (const DG::TreeViewSelectionEvent& ev) override;
 
 	// Tree population
 	void  PopulateProjectTree ();
@@ -81,12 +119,21 @@ private:
 									const GS::Array<ClassificationNode>& nodes,
 									Int32 parentItem,
 									UInt32& count,
-									const GS::Array<DiffEntry>& diffs);
+									const GS::Array<DiffEntry>& diffs,
+									TreeSide side);
 
 	static DiffStatus  FindDiffStatus (const GS::Array<DiffEntry>& diffs,
 									   const GS::UniString& id);
 
-	// Controls
+	// Actions
+	void  BrowseForXml ();
+	void  DoImportFromServer ();
+	void  DoExportToServer ();
+	void  DoUseProject ();
+	void  DoUseServer ();
+	void  UpdateActionButtons ();
+
+	// Controls (items 1-11, existing)
 	DG::LeftText            labelProject;
 	DG::LeftText            labelConflicts;
 	DG::LeftText            labelServer;
@@ -99,6 +146,15 @@ private:
 	DG::Button              buttonRefresh;
 	DG::Button              buttonClose;
 
+	// Controls (items 12-18, new)
+	DG::LeftText            labelXmlPath;
+	DG::Button              buttonBrowse;
+	DG::Button              buttonImport;
+	DG::Button              buttonExport;
+	DG::Button              buttonUseProject;
+	DG::Button              buttonUseServer;
+	DG::LeftText            labelVersion;
+
 	// Data
 	GS::Array<ClassificationTree>   projectData;
 	GS::Array<ClassificationTree>   serverData;
@@ -108,6 +164,12 @@ private:
 	GS::Array<Int32>  projectRootItems;
 	GS::Array<Int32>  serverRootItems;
 	GS::Array<Int32>  conflictRootItems;
+
+	// Mapping: conflicts tree item ID -> index in diffEntries
+	GS::HashTable<Int32, UInt32>  conflictItemToDiffIndex;
+
+	// XML file path (loaded from preferences)
+	static GS::UniString  xmlFilePath;
 
 	// Singleton
 	static ClassSyncPalette*  instance;

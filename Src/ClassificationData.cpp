@@ -22,6 +22,7 @@ static void ReadChildrenRecursive (const API_Guid& parentGuid,
 		node.id          = fullItem.id;
 		node.name        = fullItem.name;
 		node.description = fullItem.description;
+		node.guid        = fullItem.guid;
 
 		ReadChildrenRecursive (fullItem.guid, node.children);
 		result.Push (node);
@@ -45,6 +46,7 @@ GS::Array<ClassificationTree> ReadProjectClassifications ()
 		ClassificationTree tree;
 		tree.systemName = system.name;
 		tree.version    = system.editionVersion;
+		tree.systemGuid = system.guid;
 
 		GS::Array<API_ClassificationItem> rootItems;
 		if (ACAPI_Classification_GetClassificationSystemRootItems (system.guid, rootItems) != NoError)
@@ -60,6 +62,7 @@ GS::Array<ClassificationTree> ReadProjectClassifications ()
 			node.id          = fullItem.id;
 			node.name        = fullItem.name;
 			node.description = fullItem.description;
+			node.guid        = fullItem.guid;
 
 			ReadChildrenRecursive (fullItem.guid, node.children);
 			tree.rootItems.Push (node);
@@ -73,23 +76,30 @@ GS::Array<ClassificationTree> ReadProjectClassifications ()
 
 
 // ---------------------------------------------------------------------------
-// Helper: flatten tree into an array of (id, name) pairs
+// Helper: flatten tree into an array for comparison
 // ---------------------------------------------------------------------------
 
 struct FlatItem {
-	GS::UniString id;
-	GS::UniString name;
+	GS::UniString  id;
+	GS::UniString  name;
+	GS::UniString  description;
+	API_Guid       guid;
+	API_Guid       systemGuid;
 };
 
 static void FlattenHelper (const GS::Array<ClassificationNode>& nodes,
-						   GS::Array<FlatItem>& result)
+						   GS::Array<FlatItem>& result,
+						   const API_Guid& systemGuid)
 {
 	for (UInt32 i = 0; i < nodes.GetSize (); i++) {
 		FlatItem fi;
-		fi.id   = nodes[i].id;
-		fi.name = nodes[i].name;
+		fi.id          = nodes[i].id;
+		fi.name        = nodes[i].name;
+		fi.description = nodes[i].description;
+		fi.guid        = nodes[i].guid;
+		fi.systemGuid  = systemGuid;
 		result.Push (fi);
-		FlattenHelper (nodes[i].children, result);
+		FlattenHelper (nodes[i].children, result, systemGuid);
 	}
 }
 
@@ -107,17 +117,20 @@ GS::Array<DiffEntry> CompareClassifications (
 	// Flatten both sides
 	GS::Array<FlatItem> projectItems;
 	for (UInt32 s = 0; s < project.GetSize (); s++)
-		FlattenHelper (project[s].rootItems, projectItems);
+		FlattenHelper (project[s].rootItems, projectItems, project[s].systemGuid);
 
 	GS::Array<FlatItem> serverItems;
 	for (UInt32 s = 0; s < server.GetSize (); s++)
-		FlattenHelper (server[s].rootItems, serverItems);
+		FlattenHelper (server[s].rootItems, serverItems, server[s].systemGuid);
 
 	// For each project item, check if it exists in server
 	for (UInt32 i = 0; i < projectItems.GetSize (); i++) {
 		DiffEntry entry;
-		entry.id          = projectItems[i].id;
-		entry.projectName = projectItems[i].name;
+		entry.id                = projectItems[i].id;
+		entry.projectName       = projectItems[i].name;
+		entry.description       = projectItems[i].description;
+		entry.projectItemGuid   = projectItems[i].guid;
+		entry.projectSystemGuid = projectItems[i].systemGuid;
 
 		bool found = false;
 		for (UInt32 j = 0; j < serverItems.GetSize (); j++) {
@@ -147,9 +160,12 @@ GS::Array<DiffEntry> CompareClassifications (
 		}
 		if (!found) {
 			DiffEntry entry;
-			entry.id         = serverItems[j].id;
-			entry.serverName = serverItems[j].name;
-			entry.status     = DiffStatus::OnlyInServer;
+			entry.id                = serverItems[j].id;
+			entry.serverName        = serverItems[j].name;
+			entry.description       = serverItems[j].description;
+			entry.status            = DiffStatus::OnlyInServer;
+			entry.projectItemGuid   = APINULLGuid;
+			entry.projectSystemGuid = APINULLGuid;
 			result.Push (entry);
 		}
 	}
