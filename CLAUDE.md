@@ -153,9 +153,12 @@ cmake --build . --config Release
 ```
 
 ### Instalacja add-onu
-`deploy.cmd` kopiuje ClassSync.apx do: `C:\Program Files\GRAPHISOFT\Archicad 28\Dodatki\`
-Lub: Options > Add-On Manager > wskazac plik
-**UWAGA**: Usunac stary PlantSync.apx z Dodatki jesli istnieje!
+`deploy.cmd` - automatyczny deploy:
+1. Czeka az Archicad.exe sie zamknie (polling co 2s)
+2. Podnosi uprawnienia (UAC)
+3. Usuwa stary PlantSync.apx jesli istnieje
+4. Kopiuje ClassSync.apx do `C:\Program Files\GRAPHISOFT\Archicad 28\Dodatki\`
+Proces ArchiCAD: `Archicad.exe` (widoczny w Task Manager)
 
 ### Konwencje
 - C++17
