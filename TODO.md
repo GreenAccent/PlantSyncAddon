@@ -32,6 +32,10 @@
 - [ ] **Rename na ClassSync** - nazwa dodatku, katalog, repo, wszystkie pliki i referencje
 - [ ] **Menu: "ClassSync" > "Sync"** - zamiast "Options" menu powinno nazywac sie "ClassSync", z jedna opcja "Sync"
 
+## Do zrobienia (v0.5 - krytyczne)
+- [ ] **Blokowanie XML (locking)** - mechanizm blokad zapobiegajacy jednoczesnej edycji tego samego XML przez wielu uzytkownikow; granularnosc do ustalenia: caly plik, fragment drzewa (galaz), lub pojedynczy obiekt; moze wybierany przez usera; plik lockowy obok XML lub sekcja w samym XML; musi obslugiwac crash recovery (stale locki)
+- [ ] **Changelog / sledzenie zmian** - dodatek generuje log zmian: kto edytowal, co zmienil, kiedy; format do ustalenia (osobny plik changelog obok XML, lub sekcja w XML); identyfikacja usera (nazwa komputera / login Windows / konfigurowalny nick)
+
 ## Do zrobienia (pozniej)
 - [ ] Menu checkmark (zaznaczenie gdy paleta otwarta)
 - [ ] Obsluga properties (import/export definicji)
