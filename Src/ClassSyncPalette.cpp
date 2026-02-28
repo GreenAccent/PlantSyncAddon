@@ -314,10 +314,20 @@ void ClassSyncPalette::ButtonClicked (const DG::ButtonClickEvent& ev)
 
 void ClassSyncPalette::TreeViewSelectionChanged (const DG::TreeViewSelectionEvent& ev)
 {
-	if (ev.GetSource () == &treeConflicts) {
+	if (ev.GetSource () == &treeConflicts)
 		UpdateActionButtons ();
+}
 
-		// Sync selection in side trees
+
+// ---------------------------------------------------------------------------
+// TreeViewObserver: item clicked (fires on every click, even re-click)
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::TreeViewItemClicked (const DG::TreeViewItemClickEvent& ev,
+											 bool* /*denySelectionChange*/)
+{
+	if (ev.GetSource () == &treeConflicts) {
+		// Sync selection in side trees on every click
 		Int32 selected = treeConflicts.GetSelectedItem ();
 		UInt32 diffIdx;
 		if (selected != 0 && conflictItemToDiffIndex.Get (selected, &diffIdx))

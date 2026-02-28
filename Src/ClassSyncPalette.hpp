@@ -110,6 +110,7 @@ private:
 
 	// DG::TreeViewObserver
 	virtual void  TreeViewSelectionChanged (const DG::TreeViewSelectionEvent& ev) override;
+	virtual void  TreeViewItemClicked (const DG::TreeViewItemClickEvent& ev, bool* denySelectionChange) override;
 
 	// Tree population
 	void  PopulateProjectTree ();
