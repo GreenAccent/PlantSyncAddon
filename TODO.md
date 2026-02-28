@@ -28,7 +28,7 @@
 - [x] **Refresh przy otwarciu** - RefreshData() przy kazdym otwarciu palety (Show po Hide)
 - [ ] **Edytor obiektow (panel properties)** - po zaznaczeniu itemu w drzewku Project lub Server wyswietlic jego wlasciwosci w panelu edycyjnym; mozliwosc recznej edycji; przy zaznaczeniu konfliktu (srodkowe drzewko) edytor nieaktywny (dotyczy dwoch obiektow)
 - [ ] **Resize + zapamietywanie rozmiaru** - Palette | grow, proporcjonalny 3-kolumnowy layout, rozmiar zapisywany w preferencjach
-- [ ] **Status/postep wczytywania** - wskaznik ze trwa wczytywanie XML z serwera / danych z projektu; duze pliki moga dlugo trwac
+- [x] **Status/postep wczytywania** - label statusu ("Reading project...", "Reading XML...", "Comparing...", "Updating trees...")
 - [x] **Rename na ClassSync** - pliki zasobow, referencje, deploy.cmd, README, docs
 - [x] **Menu: "ClassSync" > "Sync"** - menu "ClassSync" z opcja "Sync"
 
@@ -36,6 +36,9 @@
 - [ ] **Walidacja XML** - sprawdzanie poprawnosci struktury XML przed obrobka; brak oficjalnej schemy ArchiCAD - trzeba napisac wlasna walidacje (wymagane tagi: BuildingInformation/Classification/System/Items/Item, wymagane pola Item: ID/Name/Description/Children, poprawnosc hierarchii, formaty ID); walidacja przed importem i po eksporcie
 - [ ] **Blokowanie XML (locking)** - mechanizm blokad zapobiegajacy jednoczesnej edycji tego samego XML przez wielu uzytkownikow; granularnosc do ustalenia: caly plik, fragment drzewa (galaz), lub pojedynczy obiekt; moze wybierany przez usera; plik lockowy obok XML lub sekcja w samym XML; musi obslugiwac crash recovery (stale locki)
 - [ ] **Changelog / sledzenie zmian** - dodatek generuje log zmian: kto edytowal, co zmienil, kiedy; format do ustalenia (osobny plik changelog obok XML, lub sekcja w XML); identyfikacja usera (nazwa komputera / login Windows / konfigurowalny nick)
+
+## Do zrobienia (v0.5 - UX)
+- [ ] **Synchronizacja selekcji** - klik na konflikcie (srodkowe drzewko) automatycznie przechodzi do odpowiedniego itemu w drzewku Project i Server, zeby nie trzeba bylo szukac reczne
 
 ## Do zrobienia (pozniej)
 - [x] Menu checkmark (zaznaczenie gdy paleta otwarta)

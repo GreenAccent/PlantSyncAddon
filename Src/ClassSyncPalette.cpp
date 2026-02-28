@@ -771,6 +771,14 @@ void ClassSyncPalette::PopulateConflictsTree ()
 // Refresh: re-read project + server data, run diff, repopulate all trees
 // ---------------------------------------------------------------------------
 
+void ClassSyncPalette::SetStatus (const GS::UniString& text)
+{
+	countConflicts.SetText (text);
+	countConflicts.Redraw ();
+	DG::Panel::RedrawItems ();
+}
+
+
 void ClassSyncPalette::RefreshData ()
 {
 	if (xmlFilePath.IsEmpty ()) {
@@ -784,14 +792,18 @@ void ClassSyncPalette::RefreshData ()
 	ACAPI_WriteReport ("ClassSync v%s: RefreshData starting...", false, kClassSyncVersion);
 	ACAPI_WriteReport ("ClassSync: XML path = %s", false, pathUtf8.c_str ());
 
-	// Read data
+	// Read project data
+	SetStatus ("Reading project...");
 	projectData = ReadProjectClassifications ();
 	ACAPI_WriteReport ("ClassSync: Project: %d systems", false, (int)projectData.GetSize ());
 
+	// Read server data
+	SetStatus ("Reading XML...");
 	serverData  = ReadXmlClassifications (pathUtf8.c_str ());
 	ACAPI_WriteReport ("ClassSync: Server: %d systems", false, (int)serverData.GetSize ());
 
 	// Run diff
+	SetStatus ("Comparing...");
 	diffEntries = CompareClassifications (projectData, serverData);
 
 	UInt32 matches = 0, conflicts = 0, onlyProj = 0, onlyServ = 0;
@@ -807,6 +819,7 @@ void ClassSyncPalette::RefreshData ()
 		false, matches, conflicts, onlyProj, onlyServ);
 
 	// Populate trees
+	SetStatus ("Updating trees...");
 	PopulateProjectTree ();
 	PopulateServerTree ();
 	PopulateConflictsTree ();

@@ -125,6 +125,9 @@ private:
 	static DiffStatus  FindDiffStatus (const GS::Array<DiffEntry>& diffs,
 									   const GS::UniString& id);
 
+	// Status
+	void  SetStatus (const GS::UniString& text);
+
 	// Actions
 	void  BrowseForXml ();
 	void  DoImportFromServer ();
