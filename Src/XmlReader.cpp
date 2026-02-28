@@ -100,10 +100,19 @@ static void ParseItems (const std::string& xml, GS::Array<ClassificationNode>& r
 		node.name        = ToUniStr (ExtractTag (headerPart, "Name"));
 		node.description = ToUniStr (ExtractTag (headerPart, "Description"));
 
-		// Parse children recursively
-		std::string childrenXml = ExtractTag (itemXml, "Children");
-		if (!childrenXml.empty ())
-			ParseItems (childrenXml, node.children);
+		// Parse children recursively (must use nesting-aware search
+		// because Children tags are nested: Item/Children/Item/Children/...)
+		auto childrenOpenPos = itemXml.find ("<Children>");
+		if (childrenOpenPos != std::string::npos) {
+			size_t childrenContentStart = childrenOpenPos + 10;  // strlen("<Children>")
+			auto childrenClosePos = FindMatchingClose (itemXml, "Children", childrenContentStart);
+			if (childrenClosePos != std::string::npos) {
+				std::string childrenXml = itemXml.substr (childrenContentStart,
+					childrenClosePos - childrenContentStart);
+				if (!childrenXml.empty ())
+					ParseItems (childrenXml, node.children);
+			}
+		}
 
 		result.Push (node);
 		pos = end + 7;  // skip past "</Item>"
