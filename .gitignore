@@ -1,0 +1,33 @@
+# Build
+build/
+out/
+cmake-build-*/
+*.apx
+*.res
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.dll
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.ncb
+*.sdf
+*.opensdf
+
+# Generated resources
+*.grc.rc2
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temp
+*.tmp
+*.log
