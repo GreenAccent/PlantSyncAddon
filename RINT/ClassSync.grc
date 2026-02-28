@@ -5,13 +5,13 @@
 
 'STR#' 32500 "Menu Strings" {
 /* [   ] */		"ClassSync"
-/* [   ] */		""
-/* [  1] */		"Sync"
+/* [   ] */		"ClassSync"
+/* [  1] */		"Sync^ES^EE^EI^ED^EW^E3^EL"
 }
 
 'STR#' 32501 "Menu Prompts" {
 /* [   ] */		"ClassSync"
-/* [   ] */		""
+/* [   ] */		"ClassSync"
 /* [  1] */		"Open the ClassSync comparison palette"
 }
 
