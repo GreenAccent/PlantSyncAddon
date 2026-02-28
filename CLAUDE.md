@@ -50,6 +50,12 @@ miedzy projektami ArchiCAD a wspoldzielonym plikiem master XML.
 - Istniejacy CLI: `C:\Users\Green\claude\plantsync\`
 - Master XML: `C:\Users\Green\claude\Green Accent PLANTS.xml`
 
+### Graphisoft Developer Registration
+- Developer ID: 860318800
+- Authorization Key: VCMXXGWYMZV3XXQK
+- PlantSync Local ID: 1954174874
+- Portal: https://archicadapi.graphisoft.com/
+
 ### Brak
 - vcpkg, Conan - niezainstalowane
 - GCC/MinGW - niezainstalowane
@@ -60,21 +66,20 @@ miedzy projektami ArchiCAD a wspoldzielonym plikiem master XML.
 ### Struktura plikow
 ```
 PlantSyncAddon/
-  CMakeLists.txt
+  CMakeLists.txt              # AC_ADDON_NAME "ClassSync", toolset v142
+  deploy.cmd                  # Kopiuje ClassSync.apx do Dodatki (UAC)
   Src/
-    APIEnvir.h              # Boilerplate platformowy
-    APICommon.h / .c        # Helpery (WriteReport, ErrID_To_Name)
-    PlantSync.cpp           # Glowny plik: 4 wymagane funkcje + menu handler
-    PlantSyncDialog.hpp/cpp # Okno dialogowe z TreeView
-    XmlUtils.hpp/cpp        # Parsowanie/generowanie XML klasyfikacji
-    ClassificationOps.hpp/cpp # Operacje na klasyfikacjach przez C++ API
+    APIEnvir.h                # Boilerplate platformowy
+    ClassSync.cpp             # 4 wymagane funkcje + menu handler + ACAPI_RegisterModelessWindow
+    ClassSyncPalette.hpp/cpp  # DG::Palette z 3 TreeViews (Project/Conflicts/Server)
+    ClassificationData.hpp/cpp # Model danych + odczyt z projektu + algorytm diff
+    XmlReader.hpp/cpp         # Parsowanie XML klasyfikacji z pliku na dysku
   RFIX/
-    PlantSyncFix.grc        # MDID (identyfikator add-onu)
-    Images/                 # Ikony SVG (opcjonalne)
+    PlantSyncFix.grc          # MDID (860318800, 1954174874)
   RFIX.win/
-    PlantSync.rc2           # Windows resources master
+    PlantSync.rc2             # Windows resources master
   RINT/
-    PlantSync.grc           # Stringi, menu, definicje dialogow
+    ClassSync.grc             # Stringi, menu, paleta (Palette | close, 960x520, 11 items)
 ```
 
 ### Wymagane 4 funkcje (eksportowane przez ACAP_STAT.lib)
@@ -114,31 +119,43 @@ ACAPI_Property_Import(xmlString, conflictPolicy)
 ### Dialogi (DG)
 Dwa style:
 1. **C-style callback**: `DGModalDialog(resModule, resId, resModule, CallbackFunc, userData)`
-2. **C++ observer**: klasa dziedziczy z `DG::ModalDialog` + `DG::PanelObserver` + `DG::ButtonItemObserver`
+2. **C++ observer**: klasa dziedziczy z `DG::Palette` + `DG::PanelObserver` + `DG::ButtonItemObserver`
 
-TreeView (do wyswietlania drzewa klasyfikacji):
+TreeView C++ API (DG::SingleSelTreeView):
 ```cpp
-// GRC: SingleSelTreeView x y w h FontSize iw ih tw th flags iconWidth
-Int32 item = DGTreeViewInsertItem(dialId, treeViewId, parentItem, DG_TVI_BOTTOM);
-DGTreeViewSetItemText(dialId, treeViewId, item, "Nazwa");
+Int32 item = tree.AppendItem(parentItem);       // dodaje child, zwraca item ID
+tree.SetItemText(item, "Nazwa");
+tree.SetItemTextColor(item, Gfx::Color(200,0,0)); // UChar 0-255 RGB
+tree.ExpandItem(item);
+tree.DisableDraw(); / tree.EnableDraw();          // batch updates
+tree.DeleteItem(item);
 ```
 
 Paleta (okno plywajace):
-- GRC typ: `Palette | grow | close`
+- GRC typ: `Palette | close` (lub `| grow` z resize handlerem)
+- `DG::Palette(resModule, resId, resModule, guid)` + `BeginEventProcessing()` / `EndEventProcessing()`
 - Rejestracja: `ACAPI_RegisterModelessWindow(refId, callback, enableFlags, guid)`
-- Singleton pattern z `BeginEventProcessing()` / `EndEventProcessing()`
+- Flagi: `API_PalEnabled_FloorPlan | API_PalEnabled_3D | ...`
+- Singleton pattern, APIPalMsg_* callback
+
+Gfx::Color (w GSRoot/Color.hpp):
+```cpp
+Gfx::Color(UChar r, UChar g, UChar b);  // 0-255
+Gfx::Color::Red, ::Green, ::Blue        // stale
+```
 
 ### Build
 ```bash
 mkdir build && cd build
 cmake .. -G "Visual Studio 16 2019" -A x64 -DAC_API_DEVKIT_DIR="C:/Program Files/GRAPHISOFT/API Development Kit 28.4001"
 cmake --build . --config Release
-# Wynik: build/Release/PlantSync.apx
+# Wynik: build/Release/ClassSync.apx
 ```
 
 ### Instalacja add-onu
-Skopiowac .apx do: `C:\Program Files\GRAPHISOFT\Archicad 28\Dodatki\`
+`deploy.cmd` kopiuje ClassSync.apx do: `C:\Program Files\GRAPHISOFT\Archicad 28\Dodatki\`
 Lub: Options > Add-On Manager > wskazac plik
+**UWAGA**: Usunac stary PlantSync.apx z Dodatki jesli istnieje!
 
 ### Konwencje
 - C++17

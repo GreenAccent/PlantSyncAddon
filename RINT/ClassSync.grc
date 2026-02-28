@@ -1,0 +1,44 @@
+'STR#' 32000 "Add-on Name and Description" {
+/* [  1] */		"ClassSync"
+/* [  2] */		"Classification synchronization for Green Accent"
+}
+
+'STR#' 32500 "Menu Strings" {
+/* [   ] */		"Options"
+/* [   ] */		"ClassSync"
+/* [  1] */		"ClassSync Palette"
+}
+
+'STR#' 32501 "Menu Prompts" {
+/* [   ] */		"Options"
+/* [   ] */		"ClassSync"
+/* [  1] */		"Toggle the ClassSync comparison palette"
+}
+
+'GDLG'  32600  Palette | close  0  0  960  520  "ClassSync" {
+/* [  1] */ LeftText              10    5  300   16  LargePlain  "Project"
+/* [  2] */ LeftText             325    5  300   16  LargePlain  "Conflicts"
+/* [  3] */ LeftText             640    5  300   16  LargePlain  "Server"
+/* [  4] */ SingleSelTreeView     10   25  300  440  LargePlain  16  16  18  15  noLabelEdit  noDragDrop  0
+/* [  5] */ SingleSelTreeView    325   25  300  440  LargePlain  16  16  18  15  noLabelEdit  noDragDrop  0
+/* [  6] */ SingleSelTreeView    640   25  300  440  LargePlain  16  16  18  15  noLabelEdit  noDragDrop  0
+/* [  7] */ LeftText              10  470  300   16  LargePlain  ""
+/* [  8] */ LeftText             325  470  300   16  LargePlain  ""
+/* [  9] */ LeftText             640  470  300   16  LargePlain  ""
+/* [ 10] */ Button               760  490   90   25  LargePlain  "Refresh"
+/* [ 11] */ Button               860  490   90   25  LargePlain  "Close"
+}
+
+'DLGH'  32600  ClassSyncPaletteDialog {
+1	""	LabelProject
+2	""	LabelConflicts
+3	""	LabelServer
+4	""	TreeProject
+5	""	TreeConflicts
+6	""	TreeServer
+7	""	CountProject
+8	""	CountConflicts
+9	""	CountServer
+10	""	ButtonRefresh
+11	""	ButtonClose
+}
