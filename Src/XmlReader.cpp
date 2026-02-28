@@ -121,13 +121,17 @@ GS::Array<ClassificationTree> ReadXmlClassifications (const char* filePath)
 
 	// Read file
 	std::ifstream file (filePath, std::ios::binary);
-	if (!file.is_open ())
+	if (!file.is_open ()) {
+		ACAPI_WriteReport ("ClassSync: Cannot open XML file: %s", false, filePath);
 		return result;
+	}
 
 	std::ostringstream ss;
 	ss << file.rdbuf ();
 	std::string content = ss.str ();
 	file.close ();
+
+	ACAPI_WriteReport ("ClassSync: Read XML file, %d bytes", false, (int)content.size ());
 
 	// Find all <System> blocks
 	std::string openSystem  = "<System>";
@@ -161,6 +165,11 @@ GS::Array<ClassificationTree> ReadXmlClassifications (const char* filePath)
 		std::string itemsXml = ExtractTag (sysXml, "Items");
 		if (!itemsXml.empty ())
 			ParseItems (itemsXml, tree.rootItems);
+
+		ACAPI_WriteReport ("ClassSync: Parsed system '%s' v%s, %d root items", false,
+			ExtractTag (sysHeader, "Name").c_str (),
+			ExtractTag (sysHeader, "EditionVersion").c_str (),
+			(int)tree.rootItems.GetSize ());
 
 		result.Push (tree);
 		pos = sysEnd + closeSystem.size ();

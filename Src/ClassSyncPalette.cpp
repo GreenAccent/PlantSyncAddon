@@ -418,15 +418,35 @@ void ClassSyncPalette::PopulateConflictsTree ()
 
 void ClassSyncPalette::RefreshData ()
 {
+	ACAPI_WriteReport ("ClassSync: RefreshData starting...", false);
+	ACAPI_WriteReport ("ClassSync: XML path = %s", false, kDefaultXmlPath);
+
 	// Read data
 	projectData = ReadProjectClassifications ();
+	ACAPI_WriteReport ("ClassSync: Project: %d systems", false, (int)projectData.GetSize ());
+
 	serverData  = ReadXmlClassifications (kDefaultXmlPath);
+	ACAPI_WriteReport ("ClassSync: Server: %d systems", false, (int)serverData.GetSize ());
 
 	// Run diff
 	diffEntries = CompareClassifications (projectData, serverData);
+
+	UInt32 matches = 0, conflicts = 0, onlyProj = 0, onlyServ = 0;
+	for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
+		switch (diffEntries[i].status) {
+			case DiffStatus::Match:         matches++;   break;
+			case DiffStatus::Conflict:      conflicts++; break;
+			case DiffStatus::OnlyInProject: onlyProj++;  break;
+			case DiffStatus::OnlyInServer:  onlyServ++;  break;
+		}
+	}
+	ACAPI_WriteReport ("ClassSync: Diff: %d match, %d conflict, %d only-project, %d only-server",
+		false, matches, conflicts, onlyProj, onlyServ);
 
 	// Populate trees
 	PopulateProjectTree ();
 	PopulateServerTree ();
 	PopulateConflictsTree ();
+
+	ACAPI_WriteReport ("ClassSync: RefreshData done.", false);
 }
