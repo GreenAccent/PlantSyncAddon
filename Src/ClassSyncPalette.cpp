@@ -213,6 +213,78 @@ void ClassSyncPalette::PanelCloseRequested (const DG::PanelCloseRequestEvent& /*
 
 
 // ---------------------------------------------------------------------------
+// PanelObserver: palette resized - proportional 3-column layout
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::PanelResized (const DG::PanelResizeEvent& /*ev*/)
+{
+	short w = GetClientWidth ();
+	short h = GetClientHeight ();
+
+	// Margins and spacing
+	const short margin = 10;
+	const short gap    = 15;
+	const short bottomArea = 150;  // space for buttons/labels below trees
+
+	// 3 equal columns
+	short colW = (w - 2 * margin - 2 * gap) / 3;
+	if (colW < 100) colW = 100;
+	short col1 = margin;
+	short col2 = margin + colW + gap;
+	short col3 = margin + 2 * (colW + gap);
+
+	// Tree height fills available space
+	short treeTop = 25;
+	short treeH   = h - treeTop - bottomArea;
+	if (treeH < 80) treeH = 80;
+
+	short countY  = treeTop + treeH + 5;
+	short xmlY    = countY + 22;
+	short btnActY = xmlY + 28;
+	short bottomY = h - 30;
+
+	// Column labels (row 1)
+	labelProject.SetPosition   (col1, 5);
+	labelConflicts.SetPosition (col2, 5);
+	labelServer.SetPosition    (col3, 5);
+
+	// Trees
+	treeProject.SetPosition   (col1, treeTop);
+	treeProject.SetSize       (colW, treeH);
+	treeConflicts.SetPosition (col2, treeTop);
+	treeConflicts.SetSize     (colW, treeH);
+	treeServer.SetPosition    (col3, treeTop);
+	treeServer.SetSize        (colW, treeH);
+
+	// Count labels
+	countProject.SetPosition   (col1, countY);
+	countProject.SetWidth      (colW);
+	countConflicts.SetPosition (col2, countY);
+	countConflicts.SetWidth    (colW);
+	countServer.SetPosition    (col3, countY);
+	countServer.SetWidth       (colW);
+
+	// XML path label + Browse button
+	labelXmlPath.SetPosition (col1, xmlY);
+	labelXmlPath.SetWidth    (w - 2 * margin - 100);
+	buttonBrowse.SetPosition (w - margin - 90, xmlY);
+
+	// Action buttons row
+	buttonImport.SetPosition     (col1,       btnActY);
+	buttonExport.SetPosition     (col1 + 115, btnActY);
+	buttonUseProject.SetPosition (col1 + 230, btnActY);
+	buttonUseServer.SetPosition  (col1 + 345, btnActY);
+
+	// Bottom row: version left, Refresh+Close right
+	labelVersion.SetPosition  (col1,            bottomY);
+	buttonRefresh.SetPosition (w - margin - 190, bottomY);
+	buttonClose.SetPosition   (w - margin - 90,  bottomY);
+
+	RedrawItems ();
+}
+
+
+// ---------------------------------------------------------------------------
 // ButtonItemObserver: button clicked
 // ---------------------------------------------------------------------------
 

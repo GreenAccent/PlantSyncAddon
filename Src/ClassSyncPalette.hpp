@@ -103,6 +103,7 @@ public:
 private:
 	// DG::PanelObserver
 	virtual void  PanelCloseRequested (const DG::PanelCloseRequestEvent& ev, bool* accepted) override;
+	virtual void  PanelResized (const DG::PanelResizeEvent& ev) override;
 
 	// DG::ButtonItemObserver
 	virtual void  ButtonClicked (const DG::ButtonClickEvent& ev) override;

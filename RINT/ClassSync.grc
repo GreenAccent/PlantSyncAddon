@@ -15,7 +15,7 @@
 /* [  1] */		"Open the ClassSync comparison palette"
 }
 
-'GDLG'  32600  Palette | close  0  0  960  560  "ClassSync" {
+'GDLG'  32600  Palette | grow | close  0  0  960  560  "ClassSync" {
 /* [  1] */ LeftText              10    5  300   16  LargePlain  "Project"
 /* [  2] */ LeftText             325    5  300   16  LargePlain  "Differences"
 /* [  3] */ LeftText             640    5  300   16  LargePlain  "Server (XML)"

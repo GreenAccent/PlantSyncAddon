@@ -27,7 +27,7 @@
 ## Do zrobienia (v0.5)
 - [x] **Refresh przy otwarciu** - RefreshData() przy kazdym otwarciu palety (Show po Hide)
 - [ ] **Edytor obiektow (panel properties)** - po zaznaczeniu itemu w drzewku Project lub Server wyswietlic jego wlasciwosci w panelu edycyjnym; mozliwosc recznej edycji; przy zaznaczeniu konfliktu (srodkowe drzewko) edytor nieaktywny (dotyczy dwoch obiektow)
-- [ ] **Resize + zapamietywanie rozmiaru** - Palette | grow, proporcjonalny 3-kolumnowy layout, rozmiar zapisywany w preferencjach
+- [x] **Resize** - Palette | grow, proporcjonalny 3-kolumnowy layout z PanelResized handler
 - [x] **Status/postep wczytywania** - label statusu ("Reading project...", "Reading XML...", "Comparing...", "Updating trees...")
 - [x] **Rename na ClassSync** - pliki zasobow, referencje, deploy.cmd, README, docs
 - [x] **Menu: "ClassSync" > "Sync"** - menu "ClassSync" z opcja "Sync"
