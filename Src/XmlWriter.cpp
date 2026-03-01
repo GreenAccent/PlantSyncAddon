@@ -152,6 +152,52 @@ static size_t FindMatchingClose (const std::string& xml,
 
 
 // ---------------------------------------------------------------------------
+// Helper: find sorted insertion position among direct child <Item> elements.
+// Scans direct children between regionStart..regionEnd, extracts each <ID>,
+// and returns the line-start position where a new item with newId should go
+// to maintain alphabetical order.
+// ---------------------------------------------------------------------------
+
+static size_t FindSortedInsertPos (const std::string& xml,
+								   size_t regionStart,
+								   size_t regionEnd,
+								   const std::string& newId)
+{
+	// Default: insert before the closing tag (end of list)
+	size_t insertPos = FindLineStart (xml, regionEnd);
+	size_t pos = regionStart;
+
+	while (pos < regionEnd) {
+		auto itemOpen = xml.find ("<Item>", pos);
+		if (itemOpen == std::string::npos || itemOpen >= regionEnd)
+			break;
+
+		// Extract <ID> from this direct child
+		auto idOpen  = xml.find ("<ID>", itemOpen);
+		auto idClose = xml.find ("</ID>", itemOpen);
+		if (idOpen == std::string::npos || idClose == std::string::npos)
+			break;
+
+		std::string childId = xml.substr (idOpen + 4, idClose - idOpen - 4);
+
+		// If this child's ID sorts after newId, insert before it
+		if (childId > newId) {
+			insertPos = FindLineStart (xml, itemOpen);
+			break;
+		}
+
+		// Skip past entire <Item>...</Item> (nesting-aware) to next sibling
+		auto itemClose = FindMatchingClose (xml, "<Item>", "</Item>", itemOpen);
+		if (itemClose == std::string::npos)
+			break;
+		pos = itemClose + 7;  // strlen("</Item>")
+	}
+
+	return insertPos;
+}
+
+
+// ---------------------------------------------------------------------------
 // Build an <Item> XML block with correct line endings
 // ---------------------------------------------------------------------------
 
@@ -224,18 +270,21 @@ bool AddItemToXml (const char* filePath,
 
 	std::string eol = DetectEol (content);
 
+	std::string newId = ToUtf8 (node.id);
+
 	if (parentId.IsEmpty ()) {
-		// Add as root item under <Items>
+		// Add as root item under <Items>, sorted alphabetically by ID
+		auto itemsOpen = content.find ("<Items>");
 		auto itemsClose = content.rfind ("</Items>");
-		if (itemsClose == std::string::npos)
+		if (itemsOpen == std::string::npos || itemsClose == std::string::npos)
 			return false;
 
 		std::string indent = DetectIndent (content, itemsClose) + "\t";
 		std::string itemXml = BuildItemXml (node, indent, eol);
 
-		// Insert at start of the </Items> line so existing indent is preserved
-		size_t lineStart = FindLineStart (content, itemsClose);
-		content.insert (lineStart, itemXml);
+		size_t insertPos = FindSortedInsertPos (content,
+			itemsOpen + 7, itemsClose, newId);  // 7 = strlen("<Items>")
+		content.insert (insertPos, itemXml);
 
 	} else {
 		// Find the parent item by ID
@@ -264,7 +313,7 @@ bool AddItemToXml (const char* filePath,
 			content.replace (childrenSelfClose, 11, replacement);  // 11 = strlen("<Children/>")
 
 		} else if (childrenOpen != std::string::npos && childrenOpen < parentClose) {
-			// Existing <Children>...</Children> - insert before </Children>
+			// Existing <Children>...</Children> - insert sorted alphabetically by ID
 			// Nesting-aware search for the matching </Children>
 			auto childrenClose = FindMatchingClose (content, "<Children>", "</Children>", childrenOpen);
 			if (childrenClose == std::string::npos)
@@ -273,9 +322,9 @@ bool AddItemToXml (const char* filePath,
 			std::string indent = DetectIndent (content, childrenClose) + "\t";
 			std::string itemXml = BuildItemXml (node, indent, eol);
 
-			// Insert at start of the </Children> line so existing indent is preserved
-			size_t lineStart = FindLineStart (content, childrenClose);
-			content.insert (lineStart, itemXml);
+			size_t insertPos = FindSortedInsertPos (content,
+				childrenOpen + 10, childrenClose, newId);  // 10 = strlen("<Children>")
+			content.insert (insertPos, itemXml);
 
 		} else {
 			return false;
