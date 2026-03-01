@@ -53,7 +53,8 @@ enum {
 	ItemButtonUseProject = 16,
 	ItemButtonUseServer  = 17,
 	ItemLabelVersion     = 18,
-	ItemButtonLock       = 19
+	ItemButtonLock       = 19,
+	ItemLabelWriteMode   = 20
 };
 
 
@@ -169,8 +170,9 @@ private:
 	DG::Button              buttonUseServer;
 	DG::LeftText            labelVersion;
 
-	// Controls (item 19, lock)
+	// Controls (items 19-20, lock)
 	DG::Button              buttonLock;
+	DG::LeftText            labelWriteMode;
 
 	// Write mode (true = we hold the .lock file)
 	bool                    writeMode;

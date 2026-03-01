@@ -59,7 +59,8 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonUseProject   (GetReference (), ItemButtonUseProject),
 	buttonUseServer    (GetReference (), ItemButtonUseServer),
 	labelVersion       (GetReference (), ItemLabelVersion),
-	buttonLock         (GetReference (), ItemButtonLock)
+	buttonLock         (GetReference (), ItemButtonLock),
+	labelWriteMode     (GetReference (), ItemLabelWriteMode)
 {
 	writeMode = false;
 
@@ -91,6 +92,10 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonUseServer.Disable ();
 
 	// Lock button: enable only if XML path is set
+	labelWriteMode.SetText ("WRITE MODE");
+	labelWriteMode.SetTextColor (kColorConflict);
+	labelWriteMode.Hide ();
+
 	if (xmlFilePath.IsEmpty ())
 		buttonLock.Disable ();
 	else
@@ -291,6 +296,7 @@ void ClassSyncPalette::PanelResized (const DG::PanelResizeEvent& /*ev*/)
 	buttonUseServer.SetPosition  (col1 + 345, btnActY);
 	buttonLock.SetPosition       (col1 + 520, btnActY);
 	buttonLock.SetWidth          (130);
+	labelWriteMode.SetPosition   (col1 + 660, btnActY + 4);
 
 	// Bottom row: version left, Refresh+Close right
 	labelVersion.SetPosition  (col1,            bottomY);
@@ -994,6 +1000,7 @@ void ClassSyncPalette::DoToggleLock ()
 		ReleaseLock (xmlFilePath);
 		writeMode = false;
 		buttonLock.SetText ("Open for write");
+		labelWriteMode.Hide ();
 		ACAPI_WriteReport ("ClassSync: Write lock released", false);
 		UpdateActionButtons ();
 		return;
@@ -1013,6 +1020,7 @@ void ClassSyncPalette::DoToggleLock ()
 	if (AcquireLock (xmlFilePath)) {
 		writeMode = true;
 		buttonLock.SetText ("Close write");
+		labelWriteMode.Show ();
 		ACAPI_WriteReport ("ClassSync: Write lock acquired", false);
 		UpdateActionButtons ();
 	} else {
@@ -1038,9 +1046,11 @@ void ClassSyncPalette::CheckLockStatus ()
 	if (IsLockedByUs (xmlFilePath)) {
 		writeMode = true;
 		buttonLock.SetText ("Close write");
+		labelWriteMode.Show ();
 	} else {
 		writeMode = false;
 		buttonLock.SetText ("Open for write");
+		labelWriteMode.Hide ();
 	}
 }
 
