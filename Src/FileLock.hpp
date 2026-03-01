@@ -9,9 +9,10 @@
 // ---------------------------------------------------------------------------
 
 struct LockInfo {
-	GS::UniString user;    // "COMPUTERNAME\USERNAME"
-	GS::UniString time;    // "2026-03-01 12:34:56"
-	bool locked;           // true if .lock file exists
+	GS::UniString user;       // "COMPUTERNAME\USERNAME"
+	GS::UniString time;       // "2026-03-01 12:34:56"
+	GS::UniString session;    // process ID (unique per ArchiCAD instance)
+	bool locked;              // true if .lock file exists
 };
 
 
@@ -33,6 +34,9 @@ bool          IsLockedByUs  (const GS::UniString& xmlPath);
 
 // Get "COMPUTERNAME\USERNAME" for the current session.
 GS::UniString GetCurrentUser ();
+
+// Get unique session ID (process ID) for this ArchiCAD instance.
+GS::UniString GetSessionId ();
 
 
 #endif // FILELOCK_HPP

@@ -6,6 +6,8 @@
 #include <cstdio>
 #include <ctime>
 
+#include <windows.h>
+
 
 // ---------------------------------------------------------------------------
 // Helper: convert GS::UniString to UTF-8 std::string
@@ -64,6 +66,19 @@ GS::UniString GetCurrentUser ()
 
 
 // ---------------------------------------------------------------------------
+// Get unique session ID (process ID) for this ArchiCAD instance
+// ---------------------------------------------------------------------------
+
+GS::UniString GetSessionId ()
+{
+	DWORD pid = GetCurrentProcessId ();
+	char buf[16];
+	snprintf (buf, sizeof (buf), "%lu", (unsigned long)pid);
+	return GS::UniString (buf, CC_UTF8);
+}
+
+
+// ---------------------------------------------------------------------------
 // Read .lock file contents
 // ---------------------------------------------------------------------------
 
@@ -89,6 +104,8 @@ LockInfo GetLockInfo (const GS::UniString& xmlPath)
 			info.user = GS::UniString (line.c_str () + 5, CC_UTF8);
 		else if (line.compare (0, 5, "time=") == 0)
 			info.time = GS::UniString (line.c_str () + 5, CC_UTF8);
+		else if (line.compare (0, 8, "session=") == 0)
+			info.session = GS::UniString (line.c_str () + 8, CC_UTF8);
 	}
 
 	return info;
@@ -104,7 +121,7 @@ bool IsLockedByUs (const GS::UniString& xmlPath)
 	LockInfo info = GetLockInfo (xmlPath);
 	if (!info.locked)
 		return false;
-	return info.user == GetCurrentUser ();
+	return info.user == GetCurrentUser () && info.session == GetSessionId ();
 }
 
 
@@ -129,8 +146,10 @@ bool AcquireLock (const GS::UniString& xmlPath)
 		return false;
 
 	std::string user = ToUtf8 (GetCurrentUser ());
+	std::string session = ToUtf8 (GetSessionId ());
 	file << "user=" << user << "\n";
 	file << "time=" << GetTimestamp () << "\n";
+	file << "session=" << session << "\n";
 	file.close ();
 
 	return true;
