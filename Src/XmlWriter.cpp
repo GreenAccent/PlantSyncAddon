@@ -23,19 +23,7 @@ static std::string ToUtf8 (const GS::UniString& us)
 
 static std::string EscapeXml (const std::string& s)
 {
-	std::string result;
-	result.reserve (s.size ());
-	for (char c : s) {
-		switch (c) {
-			case '&':  result += "&amp;";  break;
-			case '<':  result += "&lt;";   break;
-			case '>':  result += "&gt;";   break;
-			case '"':  result += "&quot;"; break;
-			case '\'': result += "&apos;"; break;
-			default:   result += c;        break;
-		}
-	}
-	return result;
+	return s;
 }
 
 

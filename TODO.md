@@ -40,6 +40,9 @@
 ## Do zrobienia (v0.5 - UX)
 - [x] **Synchronizacja selekcji** - klik na konflikcie (srodkowe drzewko) automatycznie zaznacza odpowiedni item w drzewku Project i Server
 
+## Do zrobienia (v0.6 - UX)
+- [ ] **Selekcja konfliktow w drzewkach** - zaznaczanie/wybieranie obiektow konfliktowych w lewym (Project) i prawym (Server) TreeView nie zawsze dziala poprawnie; do zbadania i naprawy
+
 ## Do zrobienia (pozniej)
 - [x] Menu checkmark (zaznaczenie gdy paleta otwarta)
 - [ ] Obsluga properties (import/export definicji)
