@@ -36,6 +36,17 @@ The palette has three main columns:
 
 Clicking an item in the Differences panel automatically selects and scrolls to the corresponding item in the Project and Server trees.
 
+### Properties Editor
+
+Below the action buttons, there is a properties editor panel:
+
+- **Click an item** in the Project or Server tree to load its properties
+- The editor shows the item's **ID** (read-only), **Name**, and **Description** (editable)
+- Edit the Name or Description and click **Save** to apply changes
+- **Project items**: saved via ArchiCAD API (undoable)
+- **Server items**: saved directly to the XML file (requires write mode)
+- When a Differences item is selected, the editor clears
+
 ## Write Mode (Database Locking)
 
 Before making changes to the XML file, you must enter write mode:

@@ -41,10 +41,10 @@ ClassSyncAddon/
   Src/
     APIEnvir.h                # Boilerplate platformowy
     ClassSync.cpp             # 4 wymagane funkcje + menu handler + preferences load/save
-    ClassSyncPalette.hpp/cpp  # DG::Palette, 19 kontrolek, singleton, import/export/resolve/lock
+    ClassSyncPalette.hpp/cpp  # DG::Palette, 26 kontrolek, singleton, import/export/resolve/lock/editor
     ClassificationData.hpp/cpp # Model danych (z GUIDs) + odczyt z projektu + diff
     XmlReader.hpp/cpp         # Parsowanie XML klasyfikacji z pliku na dysku
-    XmlWriter.hpp/cpp         # Modyfikacja XML (ChangeItemName, AddItem)
+    XmlWriter.hpp/cpp         # Modyfikacja XML (ChangeItemName, AddItem, ChangeItem)
     FileLock.hpp/cpp          # Blokada XML (.lock file obok XML)
     ChangeLog.hpp/cpp         # Dziennik zmian (changelog/YYYY-MM-DD.txt)
   RFIX/
@@ -52,7 +52,7 @@ ClassSyncAddon/
   RFIX.win/
     ClassSync.rc2             # Windows resources master
   RINT/
-    ClassSync.grc             # Stringi, menu, paleta (Palette | grow, 960x560, 19 items)
+    ClassSync.grc             # Stringi, menu, paleta (Palette | grow, 960x640, 26 items)
   docs/
     archicad-api.md           # Sygnatury API: DG, Classification, Preferences, FileDialog
     build-notes.md            # Komendy budowania, typowe bledy, deploy
@@ -71,6 +71,7 @@ GSErrCode FreeData(void);                                // Save prefs + cleanup
 - 3 kolumny TreeView: Project | Differences | Server (XML)
 - 4 przyciski akcji: Import, Export, Use Project, Use Server
 - Przycisk "Open for write" / "Close write" (blokada XML)
+- Edytor properties: Name/Description po kliknieciu w drzewko Project/Server
 - Browse button + preferences dla sciezki XML
 - Label wersji (v0.5)
 - Kolory: zielony (0,130,60)=nowe, niebieski (0,80,170)=brakujace, ceglasty (180,50,0)=konflikt

@@ -23,4 +23,14 @@ bool AddItemToXml (const char* filePath,
 				   const ClassificationNode& node);
 
 
+// ---------------------------------------------------------------------------
+// Change an item's <Name> and <Description> in the XML file, found by <ID>
+// ---------------------------------------------------------------------------
+
+bool ChangeItemInXml (const char* filePath,
+					  const GS::UniString& itemId,
+					  const GS::UniString& newName,
+					  const GS::UniString& newDescription);
+
+
 #endif // XMLWRITER_HPP

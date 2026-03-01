@@ -333,3 +333,68 @@ bool AddItemToXml (const char* filePath,
 
 	return WriteFile (filePath, content);
 }
+
+
+// ---------------------------------------------------------------------------
+// Change an item's <Name> and <Description> in the XML file
+// ---------------------------------------------------------------------------
+
+bool ChangeItemInXml (const char* filePath,
+					  const GS::UniString& itemId,
+					  const GS::UniString& newName,
+					  const GS::UniString& newDescription)
+{
+	std::string content;
+	if (!ReadFile (filePath, content))
+		return false;
+
+	std::string idStr  = ToUtf8 (itemId);
+	std::string idTag  = "<ID>" + idStr + "</ID>";
+
+	auto idPos = content.find (idTag);
+	if (idPos == std::string::npos)
+		return false;
+
+	// Find enclosing </Item> to limit our search scope
+	auto itemClose = content.find ("</Item>", idPos);
+	if (itemClose == std::string::npos)
+		itemClose = content.size ();
+
+	// Update <Name>
+	std::string nameStr = EscapeXml (ToUtf8 (newName));
+	auto nameOpen  = content.find ("<Name>", idPos);
+	auto nameClose = content.find ("</Name>", idPos);
+	if (nameOpen != std::string::npos && nameClose != std::string::npos
+		&& nameOpen < itemClose && nameClose < itemClose)
+	{
+		size_t replStart = nameOpen + 6;  // strlen("<Name>")
+		content.replace (replStart, nameClose - replStart, nameStr);
+		// Recalculate itemClose after replacement
+		itemClose = content.find ("</Item>", idPos);
+		if (itemClose == std::string::npos)
+			itemClose = content.size ();
+	}
+
+	// Update <Description>
+	std::string descStr = EscapeXml (ToUtf8 (newDescription));
+	auto descSelf = content.find ("<Description/>", idPos);
+	auto descOpen = content.find ("<Description>", idPos);
+
+	if (descSelf != std::string::npos && descSelf < itemClose
+		&& (descOpen == std::string::npos || descSelf < descOpen))
+	{
+		// Self-closing <Description/> - replace with <Description>text</Description>
+		if (!descStr.empty ()) {
+			std::string replacement = "<Description>" + descStr + "</Description>";
+			content.replace (descSelf, 14, replacement);  // 14 = strlen("<Description/>")
+		}
+	} else if (descOpen != std::string::npos && descOpen < itemClose) {
+		auto descClose = content.find ("</Description>", descOpen);
+		if (descClose != std::string::npos && descClose < itemClose) {
+			size_t replStart = descOpen + 13;  // strlen("<Description>")
+			content.replace (replStart, descClose - replStart, descStr);
+		}
+	}
+
+	return WriteFile (filePath, content);
+}

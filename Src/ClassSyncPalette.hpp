@@ -54,7 +54,13 @@ enum {
 	ItemButtonUseServer  = 17,
 	ItemLabelVersion     = 18,
 	ItemButtonLock       = 19,
-	ItemLabelWriteMode   = 20
+	ItemLabelWriteMode   = 20,
+	ItemLabelEditorInfo  = 21,
+	ItemLabelName        = 22,
+	ItemEditName         = 23,
+	ItemLabelDesc        = 24,
+	ItemEditDesc         = 25,
+	ItemButtonSave       = 26
 };
 
 
@@ -65,6 +71,17 @@ enum {
 enum TreeSide {
 	SideProject,
 	SideServer
+};
+
+
+// ---------------------------------------------------------------------------
+// Editor source (which tree's item is being edited)
+// ---------------------------------------------------------------------------
+
+enum EditorSource {
+	SourceNone,
+	SourceProject,
+	SourceServer
 };
 
 
@@ -128,7 +145,8 @@ private:
 									UInt32& count,
 									const GS::Array<DiffEntry>& diffs,
 									TreeSide side,
-									GS::HashTable<GS::UniString, Int32>* idMap);
+									GS::HashTable<GS::UniString, Int32>* idMap,
+									GS::HashTable<Int32, GS::UniString>* reverseMap);
 
 	static DiffStatus  FindDiffStatus (const GS::Array<DiffEntry>& diffs,
 									   const GS::UniString& id);
@@ -147,6 +165,14 @@ private:
 	void  UpdateActionButtons ();
 	void  DoToggleLock ();
 	void  CheckLockStatus ();
+
+	// Editor
+	void  PopulateEditor (EditorSource source);
+	void  ClearEditor ();
+	void  DoSaveEditor ();
+	static const ClassificationNode*  FindNodeById (
+		const GS::Array<ClassificationTree>& data,
+		const GS::UniString& id);
 
 	// Controls (items 1-11, existing)
 	DG::LeftText            labelProject;
@@ -174,8 +200,20 @@ private:
 	DG::Button              buttonLock;
 	DG::LeftText            labelWriteMode;
 
+	// Controls (items 21-26, editor)
+	DG::LeftText            labelEditorInfo;
+	DG::LeftText            labelName;
+	DG::TextEdit            editName;
+	DG::LeftText            labelDesc;
+	DG::TextEdit            editDesc;
+	DG::Button              buttonSave;
+
 	// Write mode (true = we hold the .lock file)
 	bool                    writeMode;
+
+	// Editor state
+	EditorSource            editorSource;
+	GS::UniString           editorItemId;
 
 	// Data
 	GS::Array<ClassificationTree>   projectData;
@@ -193,6 +231,10 @@ private:
 	// Mapping: classification ID string -> tree item ID (for selection sync)
 	GS::HashTable<GS::UniString, Int32>  projectIdToTreeItem;
 	GS::HashTable<GS::UniString, Int32>  serverIdToTreeItem;
+
+	// Reverse mapping: tree item ID -> classification ID (for editor)
+	GS::HashTable<Int32, GS::UniString>  projectTreeItemToId;
+	GS::HashTable<Int32, GS::UniString>  serverTreeItemToId;
 
 	// XML file path (loaded from preferences)
 	static GS::UniString  xmlFilePath;

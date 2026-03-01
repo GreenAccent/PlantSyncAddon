@@ -187,3 +187,20 @@ void LogImport (const GS::UniString& xmlPath)
 
 	AppendToLog (xmlPath, entry);
 }
+
+
+// ---------------------------------------------------------------------------
+// Log a property edit action (name/description changed)
+// ---------------------------------------------------------------------------
+
+void LogEdit (const GS::UniString& xmlPath,
+			  const GS::UniString& itemId,
+			  const GS::UniString& source,
+			  const GS::UniString& newName)
+{
+	std::string entry;
+	entry += "  Edit (" + ToUtf8 (source) + "): " + ToUtf8 (itemId) + "\n";
+	entry += "  New name: \"" + ToUtf8 (newName) + "\"\n";
+
+	AppendToLog (xmlPath, entry);
+}

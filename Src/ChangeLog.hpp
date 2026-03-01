@@ -26,5 +26,10 @@ void LogUseServer  (const GS::UniString& xmlPath,
 
 void LogImport     (const GS::UniString& xmlPath);
 
+void LogEdit       (const GS::UniString& xmlPath,
+					const GS::UniString& itemId,
+					const GS::UniString& source,
+					const GS::UniString& newName);
+
 
 #endif // CHANGELOG_HPP

@@ -15,7 +15,7 @@
 /* [  1] */		"Open the ClassSync comparison palette"
 }
 
-'GDLG'  32600  Palette | grow | close  0  0  960  560  "ClassSync" {
+'GDLG'  32600  Palette | grow | close  0  0  960  640  "ClassSync" {
 /* [  1] */ LeftText              10    5  300   16  LargePlain  "Project"
 /* [  2] */ LeftText             325    5  300   16  LargePlain  "Differences"
 /* [  3] */ LeftText             640    5  300   16  LargePlain  "Server (XML)"
@@ -25,17 +25,23 @@
 /* [  7] */ LeftText              10  410  300   16  LargePlain  ""
 /* [  8] */ LeftText             325  410  300   16  LargePlain  ""
 /* [  9] */ LeftText             640  410  300   16  LargePlain  ""
-/* [ 10] */ Button               760  530   90   25  LargePlain  "Refresh"
-/* [ 11] */ Button               860  530   90   25  LargePlain  "Close"
+/* [ 10] */ Button               760  610   90   25  LargePlain  "Refresh"
+/* [ 11] */ Button               860  610   90   25  LargePlain  "Close"
 /* [ 12] */ LeftText              10  432  750   16  SmallPlain  ""
 /* [ 13] */ Button               770  430   90   20  SmallPlain  "Browse..."
 /* [ 14] */ Button                10  460  110   25  LargePlain  "<- Import"
 /* [ 15] */ Button               125  460  110   25  LargePlain  "Export ->"
 /* [ 16] */ Button               250  460  110   25  LargePlain  "Use Project"
 /* [ 17] */ Button               365  460  110   25  LargePlain  "Use Server"
-/* [ 18] */ LeftText              10  535  200   16  SmallPlain  ""
+/* [ 18] */ LeftText              10  615  200   16  SmallPlain  ""
 /* [ 19] */ Button               530  460  130   25  LargePlain  "Open for write"
 /* [ 20] */ LeftText             670  464  120   16  LargePlain  ""
+/* [ 21] */ LeftText              10  495  940   16  SmallPlain  ""
+/* [ 22] */ LeftText              10  517   45   16  SmallPlain  "Name:"
+/* [ 23] */ TextEdit              60  515  550   19  SmallPlain  255
+/* [ 24] */ LeftText              10  541   45   16  SmallPlain  "Desc:"
+/* [ 25] */ TextEdit              60  539  550   19  SmallPlain  1024
+/* [ 26] */ Button               620  515   90   19  SmallPlain  "Save"
 }
 
 'DLGH'  32600  ClassSyncPaletteDialog {
@@ -59,4 +65,10 @@
 18	""	LabelVersion
 19	""	ButtonLock
 20	""	LabelWriteMode
+21	""	LabelEditorInfo
+22	""	LabelName
+23	""	EditName
+24	""	LabelDesc
+25	""	EditDesc
+26	""	ButtonSave
 }

@@ -60,9 +60,16 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonUseServer    (GetReference (), ItemButtonUseServer),
 	labelVersion       (GetReference (), ItemLabelVersion),
 	buttonLock         (GetReference (), ItemButtonLock),
-	labelWriteMode     (GetReference (), ItemLabelWriteMode)
+	labelWriteMode     (GetReference (), ItemLabelWriteMode),
+	labelEditorInfo    (GetReference (), ItemLabelEditorInfo),
+	labelName          (GetReference (), ItemLabelName),
+	editName           (GetReference (), ItemEditName),
+	labelDesc          (GetReference (), ItemLabelDesc),
+	editDesc           (GetReference (), ItemEditDesc),
+	buttonSave         (GetReference (), ItemButtonSave)
 {
 	writeMode = false;
+	editorSource = SourceNone;
 
 	Attach (*this);
 	buttonRefresh.Attach (*this);
@@ -73,7 +80,10 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonUseProject.Attach (*this);
 	buttonUseServer.Attach (*this);
 	buttonLock.Attach (*this);
+	buttonSave.Attach (*this);
 	treeConflicts.Attach (static_cast<DG::TreeViewObserver&> (*this));
+	treeProject.Attach (static_cast<DG::TreeViewObserver&> (*this));
+	treeServer.Attach (static_cast<DG::TreeViewObserver&> (*this));
 	BeginEventProcessing ();
 
 	// Version label
@@ -90,6 +100,12 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonExport.Disable ();
 	buttonUseProject.Disable ();
 	buttonUseServer.Disable ();
+
+	// Editor: disabled initially
+	labelEditorInfo.SetText ("Select an item in Project or Server tree");
+	editName.Disable ();
+	editDesc.Disable ();
+	buttonSave.Disable ();
 
 	// Lock button: enable only if XML path is set
 	labelWriteMode.SetText ("WRITE MODE");
@@ -116,7 +132,10 @@ ClassSyncPalette::~ClassSyncPalette ()
 {
 	ReleaseLockIfHeld ();
 	EndEventProcessing ();
+	treeServer.Detach (static_cast<DG::TreeViewObserver&> (*this));
+	treeProject.Detach (static_cast<DG::TreeViewObserver&> (*this));
 	treeConflicts.Detach (static_cast<DG::TreeViewObserver&> (*this));
+	buttonSave.Detach (*this);
 	buttonLock.Detach (*this);
 	buttonUseServer.Detach (*this);
 	buttonUseProject.Detach (*this);
@@ -244,7 +263,7 @@ void ClassSyncPalette::PanelResized (const DG::PanelResizeEvent& /*ev*/)
 	// Margins and spacing
 	const short margin = 10;
 	const short gap    = 15;
-	const short bottomArea = 150;  // space for buttons/labels below trees
+	const short bottomArea = 230;  // space for buttons/labels/editor below trees
 
 	// 3 equal columns
 	short colW = (w - 2 * margin - 2 * gap) / 3;
@@ -261,7 +280,6 @@ void ClassSyncPalette::PanelResized (const DG::PanelResizeEvent& /*ev*/)
 	short countY  = treeTop + treeH + 5;
 	short xmlY    = countY + 22;
 	short btnActY = xmlY + 28;
-	short bottomY = h - 30;
 
 	// Column labels (row 1)
 	labelProject.SetPosition   (col1, 5);
@@ -298,10 +316,27 @@ void ClassSyncPalette::PanelResized (const DG::PanelResizeEvent& /*ev*/)
 	buttonLock.SetWidth          (130);
 	labelWriteMode.SetPosition   (col1 + 660, btnActY + 4);
 
+	// Editor area (below action buttons)
+	short editorY = btnActY + 35;
+
+	labelEditorInfo.SetPosition (col1, editorY);
+	labelEditorInfo.SetWidth    (w - 2 * margin);
+
+	labelName.SetPosition (col1, editorY + 22);
+	editName.SetPosition  (col1 + 50, editorY + 20);
+	editName.SetWidth     (static_cast<short> (w - 2 * margin - 160));
+
+	labelDesc.SetPosition (col1, editorY + 46);
+	editDesc.SetPosition  (col1 + 50, editorY + 44);
+	editDesc.SetWidth     (static_cast<short> (w - 2 * margin - 160));
+
+	buttonSave.SetPosition (static_cast<short> (w - margin - 100), editorY + 20);
+
 	// Bottom row: version left, Refresh+Close right
-	labelVersion.SetPosition  (col1,            bottomY);
-	buttonRefresh.SetPosition (w - margin - 190, bottomY);
-	buttonClose.SetPosition   (w - margin - 90,  bottomY);
+	short bottomY2 = h - 30;
+	labelVersion.SetPosition  (col1,             bottomY2);
+	buttonRefresh.SetPosition (static_cast<short> (w - margin - 190), bottomY2);
+	buttonClose.SetPosition   (static_cast<short> (w - margin - 90),  bottomY2);
 
 	RedrawItems ();
 }
@@ -329,6 +364,8 @@ void ClassSyncPalette::ButtonClicked (const DG::ButtonClickEvent& ev)
 		DoUseServer ();
 	} else if (ev.GetSource () == &buttonLock) {
 		DoToggleLock ();
+	} else if (ev.GetSource () == &buttonSave) {
+		DoSaveEditor ();
 	}
 }
 
@@ -339,8 +376,14 @@ void ClassSyncPalette::ButtonClicked (const DG::ButtonClickEvent& ev)
 
 void ClassSyncPalette::TreeViewSelectionChanged (const DG::TreeViewSelectionEvent& ev)
 {
-	if (ev.GetSource () == &treeConflicts)
+	if (ev.GetSource () == &treeConflicts) {
 		UpdateActionButtons ();
+		ClearEditor ();
+	} else if (ev.GetSource () == &treeProject) {
+		PopulateEditor (SourceProject);
+	} else if (ev.GetSource () == &treeServer) {
+		PopulateEditor (SourceServer);
+	}
 }
 
 
@@ -430,6 +473,10 @@ void ClassSyncPalette::UpdateActionButtons ()
 		default:
 			break;
 	}
+
+	// Editor Save button: disable for Server items without write mode
+	if (editorSource == SourceServer && !writeMode)
+		buttonSave.Disable ();
 }
 
 
@@ -691,7 +738,8 @@ void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 										   UInt32& count,
 										   const GS::Array<DiffEntry>& diffs,
 										   TreeSide side,
-										   GS::HashTable<GS::UniString, Int32>* idMap)
+										   GS::HashTable<GS::UniString, Int32>* idMap,
+										   GS::HashTable<Int32, GS::UniString>* reverseMap)
 {
 	for (UInt32 i = 0; i < nodes.GetSize (); i++) {
 		const ClassificationNode& node = nodes[i];
@@ -705,6 +753,10 @@ void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 		// Store mapping for selection sync
 		if (idMap != nullptr)
 			idMap->Add (node.id, treeItem);
+
+		// Store reverse mapping for editor
+		if (reverseMap != nullptr)
+			reverseMap->Add (treeItem, node.id);
 
 		// Apply color based on diff status and which tree we're in
 		if (diffs.GetSize () > 0) {
@@ -727,7 +779,7 @@ void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 		}
 
 		// Recurse into children
-		FillTreeWithNodes (tree, node.children, treeItem, count, diffs, side, idMap);
+		FillTreeWithNodes (tree, node.children, treeItem, count, diffs, side, idMap, reverseMap);
 	}
 }
 
@@ -754,6 +806,7 @@ void ClassSyncPalette::PopulateProjectTree ()
 {
 	ClearTree (treeProject, projectRootItems);
 	projectIdToTreeItem.Clear ();
+	projectTreeItemToId.Clear ();
 	treeProject.DisableDraw ();
 
 	UInt32 itemCount = 0;
@@ -768,7 +821,7 @@ void ClassSyncPalette::PopulateProjectTree ()
 		treeProject.SetItemText (sysNode, sysLabel);
 		projectRootItems.Push (sysNode);
 
-		FillTreeWithNodes (treeProject, tree.rootItems, sysNode, itemCount, diffEntries, SideProject, &projectIdToTreeItem);
+		FillTreeWithNodes (treeProject, tree.rootItems, sysNode, itemCount, diffEntries, SideProject, &projectIdToTreeItem, &projectTreeItemToId);
 		treeProject.ExpandItem (sysNode);
 	}
 
@@ -789,6 +842,7 @@ void ClassSyncPalette::PopulateServerTree ()
 {
 	ClearTree (treeServer, serverRootItems);
 	serverIdToTreeItem.Clear ();
+	serverTreeItemToId.Clear ();
 	treeServer.DisableDraw ();
 
 	UInt32 itemCount = 0;
@@ -803,7 +857,7 @@ void ClassSyncPalette::PopulateServerTree ()
 		treeServer.SetItemText (sysNode, sysLabel);
 		serverRootItems.Push (sysNode);
 
-		FillTreeWithNodes (treeServer, tree.rootItems, sysNode, itemCount, diffEntries, SideServer, &serverIdToTreeItem);
+		FillTreeWithNodes (treeServer, tree.rootItems, sysNode, itemCount, diffEntries, SideServer, &serverIdToTreeItem, &serverTreeItemToId);
 		treeServer.ExpandItem (sysNode);
 	}
 
@@ -979,6 +1033,9 @@ void ClassSyncPalette::RefreshData ()
 	PopulateServerTree ();
 	PopulateConflictsTree ();
 
+	// Clear editor (trees were rebuilt, old selection is gone)
+	ClearEditor ();
+
 	// Check lock status (may have changed since last refresh)
 	CheckLockStatus ();
 	UpdateActionButtons ();
@@ -1066,4 +1123,163 @@ void ClassSyncPalette::ReleaseLockIfHeld ()
 		instance->writeMode = false;
 		ACAPI_WriteReport ("ClassSync: Write lock auto-released", false);
 	}
+}
+
+
+// ---------------------------------------------------------------------------
+// Helper: recursively find a node by ID in classification data
+// ---------------------------------------------------------------------------
+
+static const ClassificationNode* FindNodeInArray (
+	const GS::Array<ClassificationNode>& nodes,
+	const GS::UniString& id)
+{
+	for (UInt32 i = 0; i < nodes.GetSize (); i++) {
+		if (nodes[i].id == id)
+			return &nodes[i];
+		const ClassificationNode* found = FindNodeInArray (nodes[i].children, id);
+		if (found != nullptr)
+			return found;
+	}
+	return nullptr;
+}
+
+const ClassificationNode* ClassSyncPalette::FindNodeById (
+	const GS::Array<ClassificationTree>& data,
+	const GS::UniString& id)
+{
+	for (UInt32 s = 0; s < data.GetSize (); s++) {
+		const ClassificationNode* found = FindNodeInArray (data[s].rootItems, id);
+		if (found != nullptr)
+			return found;
+	}
+	return nullptr;
+}
+
+
+// ---------------------------------------------------------------------------
+// Populate the editor panel from the selected item in a side tree
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::PopulateEditor (EditorSource source)
+{
+	DG::SingleSelTreeView& tree = (source == SourceProject) ? treeProject : treeServer;
+	const GS::HashTable<Int32, GS::UniString>& reverseMap =
+		(source == SourceProject) ? projectTreeItemToId : serverTreeItemToId;
+	const GS::Array<ClassificationTree>& data =
+		(source == SourceProject) ? projectData : serverData;
+
+	Int32 selected = tree.GetSelectedItem ();
+	if (selected == 0 || selected == DG::TreeView::RootItem) {
+		ClearEditor ();
+		return;
+	}
+
+	GS::UniString itemId;
+	if (!reverseMap.Get (selected, &itemId)) {
+		// System header node - no ID mapping
+		ClearEditor ();
+		return;
+	}
+
+	const ClassificationNode* node = FindNodeById (data, itemId);
+	if (node == nullptr) {
+		ClearEditor ();
+		return;
+	}
+
+	editorSource = source;
+	editorItemId = itemId;
+
+	GS::UniString sourceStr = (source == SourceProject) ? "Project" : "Server (XML)";
+	labelEditorInfo.SetText (sourceStr + ": " + node->id + "  -  " + node->name);
+
+	editName.SetText (node->name);
+	editDesc.SetText (node->description);
+	editName.Enable ();
+	editDesc.Enable ();
+
+	// Save: Server requires writeMode
+	if (source == SourceServer && !writeMode)
+		buttonSave.Disable ();
+	else
+		buttonSave.Enable ();
+}
+
+
+// ---------------------------------------------------------------------------
+// Clear the editor panel
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::ClearEditor ()
+{
+	editorSource = SourceNone;
+	editorItemId.Clear ();
+	labelEditorInfo.SetText ("Select an item in Project or Server tree");
+	editName.SetText ("");
+	editDesc.SetText ("");
+	editName.Disable ();
+	editDesc.Disable ();
+	buttonSave.Disable ();
+}
+
+
+// ---------------------------------------------------------------------------
+// Save the edited properties back to project or XML
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::DoSaveEditor ()
+{
+	if (editorSource == SourceNone || editorItemId.IsEmpty ())
+		return;
+
+	GS::UniString newName = editName.GetText ();
+	GS::UniString newDesc = editDesc.GetText ();
+
+	if (editorSource == SourceProject) {
+		const ClassificationNode* node = FindNodeById (projectData, editorItemId);
+		if (node == nullptr || node->guid == APINULLGuid)
+			return;
+
+		API_ClassificationItem item;
+		item.guid = node->guid;
+		if (ACAPI_Classification_GetClassificationItem (item) != NoError)
+			return;
+
+		item.name        = newName;
+		item.description = newDesc;
+
+		GSErrCode err = ACAPI_CallUndoableCommand (
+			GS::UniString ("ClassSync: Edit item"),
+			[&] () -> GSErrCode {
+				return ACAPI_Classification_ChangeClassificationItem (item);
+			});
+
+		if (err == NoError) {
+			ACAPI_WriteReport ("ClassSync: Edited project item '%s'", false,
+							   editorItemId.ToCStr ().Get ());
+			LogEdit (xmlFilePath, editorItemId, "Project", newName);
+		} else {
+			ACAPI_WriteReport ("ClassSync: Failed to edit item '%s', error %d", false,
+							   editorItemId.ToCStr ().Get (), (int)err);
+		}
+
+	} else if (editorSource == SourceServer) {
+		if (!writeMode)
+			return;
+
+		std::string path (xmlFilePath.ToCStr (0, MaxUSize, CC_UTF8).Get ());
+		bool success = ChangeItemInXml (path.c_str (), editorItemId, newName, newDesc);
+
+		if (success) {
+			ACAPI_WriteReport ("ClassSync: Edited server item '%s'", false,
+							   editorItemId.ToCStr ().Get ());
+			LogEdit (xmlFilePath, editorItemId, "Server", newName);
+		} else {
+			ACAPI_WriteReport ("ClassSync: Failed to edit XML item '%s'", false,
+							   editorItemId.ToCStr ().Get ());
+		}
+	}
+
+	RefreshData ();
 }
