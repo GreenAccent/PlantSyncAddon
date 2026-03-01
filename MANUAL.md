@@ -46,8 +46,8 @@ Before making changes to the XML file, you must enter write mode:
 
 ### Lock behavior
 
-- **Only one user at a time** can hold the write lock
-- If another user has the lock, clicking "Open for write" shows who holds it and since when
+- **Only one session at a time** can hold the write lock (each ArchiCAD instance counts as a separate session)
+- If another user or another ArchiCAD instance has the lock, clicking "Open for write" shows who holds it and since when
 - Click **Refresh** to check if the lock has been released
 - The lock is **automatically released** when:
   - You click "Close write"

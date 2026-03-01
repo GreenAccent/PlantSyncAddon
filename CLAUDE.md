@@ -45,7 +45,7 @@ ClassSyncAddon/
     ClassificationData.hpp/cpp # Model danych (z GUIDs) + odczyt z projektu + diff
     XmlReader.hpp/cpp         # Parsowanie XML klasyfikacji z pliku na dysku
     XmlWriter.hpp/cpp         # Modyfikacja XML (ChangeItemName, AddItem)
-    FileLock.hpp/cpp          # Blokada XML (.lock file obok XML)
+    FileLock.hpp/cpp          # Blokada XML (.lock file obok XML, session=PID)
     ChangeLog.hpp/cpp         # Dziennik zmian (changelog/YYYY-MM-DD.txt)
   RFIX/
     ClassSyncFix.grc          # MDID (860318800, 1954174874)
@@ -78,6 +78,7 @@ GSErrCode FreeData(void);                                // Save prefs + cleanup
 - `ACAPI_RegisterModelessWindow` z APIPalMsg_* callback
 - `DG::TreeViewObserver` do sledzenia selekcji w drzewku konfliktow
 - Write mode: Export i Use Project wymagaja blokady (writeMode=true)
+- Lock identyfikowany per sesja ArchiCAD (PID), nie per user - wiele instancji AC na jednej maszynie dziala poprawnie
 
 ### Mechanizm rozwiazywania roznic
 - **Import**: `ACAPI_Classification_Import(xml, MergeConflicting, SkipConflicting)` - importuje brakujace z XML

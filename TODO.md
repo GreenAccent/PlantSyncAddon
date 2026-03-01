@@ -26,7 +26,7 @@
 
 ## Do zrobienia (v0.5)
 - [x] **Refresh przy otwarciu** - RefreshData() przy kazdym otwarciu palety (Show po Hide)
-- [ ] **Edytor obiektow (panel properties)** - po zaznaczeniu itemu w drzewku Project lub Server wyswietlic jego wlasciwosci w panelu edycyjnym; mozliwosc recznej edycji; przy zaznaczeniu konfliktu (srodkowe drzewko) edytor nieaktywny (dotyczy dwoch obiektow)
+- [ ] **Edytor obiektow (panel properties)** - WIP na branch `feature/editor`; po zaznaczeniu itemu w drzewku Project lub Server wyswietlic Name/Description w panelu edycyjnym; edycja + Save; przy zaznaczeniu konfliktu edytor nieaktywny
 - [x] **Resize** - Palette | grow, proporcjonalny 3-kolumnowy layout z PanelResized handler
 - [x] **Status/postep wczytywania** - label statusu ("Reading project...", "Reading XML...", "Comparing...", "Updating trees...")
 - [x] **Rename na ClassSync** - pliki zasobow, referencje, deploy.cmd, README, docs
@@ -34,7 +34,7 @@
 
 ## Do zrobienia (v0.5 - krytyczne)
 - [ ] **Walidacja XML** - sprawdzanie poprawnosci struktury XML przed obrobka; brak oficjalnej schemy ArchiCAD - trzeba napisac wlasna walidacje (wymagane tagi: BuildingInformation/Classification/System/Items/Item, wymagane pola Item: ID/Name/Description/Children, poprawnosc hierarchii, formaty ID); walidacja przed importem i po eksporcie
-- [x] **Blokowanie XML (locking)** - plik `.lock` obok XML, przycisk "Open for write" / "Close write", auto-release przy zamknieciu palety/ArchiCAD
+- [x] **Blokowanie XML (locking)** - plik `.lock` obok XML z session=PID, przycisk "Open for write" / "Close write", auto-release przy zamknieciu palety/ArchiCAD, bezpieczne przy wielu instancjach AC
 - [x] **Changelog / sledzenie zmian** - dzienne pliki `changelog/YYYY-MM-DD.txt` z wpisami kto/co/kiedy przy kazdej akcji sync
 
 ## Do zrobienia (v0.5 - UX)

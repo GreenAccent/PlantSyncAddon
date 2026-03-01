@@ -18,7 +18,7 @@ droga to C++ API.
 - **Export** - dodaje brakujace z projektu do pliku XML
 - **Resolve Conflicts** - Use Project / Use Server dla roznic w nazwach
 - **Kolorowanie diff**: zielony=nowe, niebieski=brakujace, ceglasty=konflikt
-- **Write Mode** - blokada XML (plik `.lock`) zapobiega jednoczesnej edycji
+- **Write Mode** - blokada XML (plik `.lock` z session ID) zapobiega jednoczesnej edycji, nawet miedzy instancjami AC na jednej maszynie
 - **Changelog** - dzienne logi zmian w `changelog/YYYY-MM-DD.txt`
 
 ## Budowanie
