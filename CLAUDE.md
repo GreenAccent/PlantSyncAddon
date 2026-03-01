@@ -96,6 +96,7 @@ deploy.cmd        # Alternatywny deploy (Windows CMD)
 ```
 
 ### Konwencje
+- **Wersjonowanie**: czesto inkrementowac minor version (kClassSyncVersion w ClassSyncPalette.hpp) przy kazdym PUSHU - nie kumulowac wielu zmian pod jednym numerem wersji
 - C++17, UNICODE/_UNICODE
 - Zasoby w plikach .grc, Resource ID: 32000+ (nazwa), 32500+ (menu), 32600 (paleta)
 - .apx = .dll eksportujacy GetExportedFuncAddrs@1 i SetImportedFuncAddrs@2
