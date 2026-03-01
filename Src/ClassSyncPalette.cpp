@@ -1,6 +1,8 @@
 #include "ClassSyncPalette.hpp"
 #include "XmlReader.hpp"
 #include "XmlWriter.hpp"
+#include "FileLock.hpp"
+#include "ChangeLog.hpp"
 #include "DGFileDlg.hpp"
 
 #include <fstream>
@@ -56,8 +58,11 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonExport       (GetReference (), ItemButtonExport),
 	buttonUseProject   (GetReference (), ItemButtonUseProject),
 	buttonUseServer    (GetReference (), ItemButtonUseServer),
-	labelVersion       (GetReference (), ItemLabelVersion)
+	labelVersion       (GetReference (), ItemLabelVersion),
+	buttonLock         (GetReference (), ItemButtonLock)
 {
+	writeMode = false;
+
 	Attach (*this);
 	buttonRefresh.Attach (*this);
 	buttonClose.Attach (*this);
@@ -66,6 +71,7 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonExport.Attach (*this);
 	buttonUseProject.Attach (*this);
 	buttonUseServer.Attach (*this);
+	buttonLock.Attach (*this);
 	treeConflicts.Attach (static_cast<DG::TreeViewObserver&> (*this));
 	BeginEventProcessing ();
 
@@ -84,6 +90,12 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonUseProject.Disable ();
 	buttonUseServer.Disable ();
 
+	// Lock button: enable only if XML path is set
+	if (xmlFilePath.IsEmpty ())
+		buttonLock.Disable ();
+	else
+		CheckLockStatus ();
+
 	ACAPI_WriteReport ("ClassSync v%s started", false, kClassSyncVersion);
 
 	if (!xmlFilePath.IsEmpty ())
@@ -97,8 +109,10 @@ ClassSyncPalette::ClassSyncPalette () :
 
 ClassSyncPalette::~ClassSyncPalette ()
 {
+	ReleaseLockIfHeld ();
 	EndEventProcessing ();
 	treeConflicts.Detach (static_cast<DG::TreeViewObserver&> (*this));
+	buttonLock.Detach (*this);
 	buttonUseServer.Detach (*this);
 	buttonUseProject.Detach (*this);
 	buttonExport.Detach (*this);
@@ -198,6 +212,7 @@ GSErrCode ClassSyncPalette::PaletteControlCallback (Int32 referenceID,
 void ClassSyncPalette::PanelCloseRequested (const DG::PanelCloseRequestEvent& /*ev*/,
 											bool* accepted)
 {
+	ReleaseLockIfHeld ();
 	Hide ();
 	*accepted = true;
 
@@ -274,6 +289,8 @@ void ClassSyncPalette::PanelResized (const DG::PanelResizeEvent& /*ev*/)
 	buttonExport.SetPosition     (col1 + 115, btnActY);
 	buttonUseProject.SetPosition (col1 + 230, btnActY);
 	buttonUseServer.SetPosition  (col1 + 345, btnActY);
+	buttonLock.SetPosition       (col1 + 520, btnActY);
+	buttonLock.SetWidth          (130);
 
 	// Bottom row: version left, Refresh+Close right
 	labelVersion.SetPosition  (col1,            bottomY);
@@ -304,6 +321,8 @@ void ClassSyncPalette::ButtonClicked (const DG::ButtonClickEvent& ev)
 		DoUseProject ();
 	} else if (ev.GetSource () == &buttonUseServer) {
 		DoUseServer ();
+	} else if (ev.GetSource () == &buttonLock) {
+		DoToggleLock ();
 	}
 }
 
@@ -394,10 +413,12 @@ void ClassSyncPalette::UpdateActionButtons ()
 			buttonImport.Enable ();
 			break;
 		case DiffStatus::OnlyInProject:
-			buttonExport.Enable ();
+			if (writeMode)
+				buttonExport.Enable ();
 			break;
 		case DiffStatus::Conflict:
-			buttonUseProject.Enable ();
+			if (writeMode)
+				buttonUseProject.Enable ();
 			buttonUseServer.Enable ();
 			break;
 		default:
@@ -421,8 +442,12 @@ void ClassSyncPalette::BrowseForXml ()
 								  GS::UniString ("Select Classification XML"));
 
 	if (success) {
+		// Release old lock if switching XML files
+		ReleaseLockIfHeld ();
+
 		xmlFilePath = loc.ToDisplayText ();
 		labelXmlPath.SetText (xmlFilePath);
+		buttonLock.Enable ();
 		SavePreferences ();
 		RefreshData ();
 	}
@@ -460,10 +485,12 @@ void ClassSyncPalette::DoImportFromServer ()
 				API_SkipConflicitingItems);
 		});
 
-	if (err == NoError)
+	if (err == NoError) {
 		ACAPI_WriteReport ("ClassSync: Import successful", false);
-	else
+		LogImport (xmlFilePath);
+	} else {
 		ACAPI_WriteReport ("ClassSync: Import failed, error %d", false, (int)err);
+	}
 
 	RefreshData ();
 }
@@ -501,12 +528,14 @@ void ClassSyncPalette::DoExportToServer ()
 
 	bool success = AddItemToXml (pathUtf8.c_str (), parentId, node);
 
-	if (success)
+	if (success) {
 		ACAPI_WriteReport ("ClassSync: Exported '%s' to XML", false,
 						   entry.id.ToCStr ().Get ());
-	else
+		LogExport (xmlFilePath, entry.id, entry.projectName, parentId);
+	} else {
 		ACAPI_WriteReport ("ClassSync: Export failed for '%s'", false,
 						   entry.id.ToCStr ().Get ());
+	}
 
 	RefreshData ();
 }
@@ -531,13 +560,15 @@ void ClassSyncPalette::DoUseProject ()
 
 	bool success = ChangeItemNameInXml (pathUtf8.c_str (), entry.id, entry.projectName);
 
-	if (success)
+	if (success) {
 		ACAPI_WriteReport ("ClassSync: XML updated - '%s' name -> '%s'", false,
 						   entry.id.ToCStr ().Get (),
 						   entry.projectName.ToCStr ().Get ());
-	else
+		LogUseProject (xmlFilePath, entry.id, entry.serverName, entry.projectName);
+	} else {
 		ACAPI_WriteReport ("ClassSync: Failed to update XML for '%s'", false,
 						   entry.id.ToCStr ().Get ());
+	}
 
 	RefreshData ();
 }
@@ -573,13 +604,15 @@ void ClassSyncPalette::DoUseServer ()
 			return ACAPI_Classification_ChangeClassificationItem (item);
 		});
 
-	if (err == NoError)
+	if (err == NoError) {
 		ACAPI_WriteReport ("ClassSync: Project item '%s' name -> '%s'", false,
 						   entry.id.ToCStr ().Get (),
 						   entry.serverName.ToCStr ().Get ());
-	else
+		LogUseServer (xmlFilePath, entry.id, entry.projectName, entry.serverName);
+	} else {
 		ACAPI_WriteReport ("ClassSync: Failed to change project item '%s', error %d", false,
 						   entry.id.ToCStr ().Get (), (int)err);
+	}
 
 	RefreshData ();
 }
@@ -939,7 +972,88 @@ void ClassSyncPalette::RefreshData ()
 	PopulateProjectTree ();
 	PopulateServerTree ();
 	PopulateConflictsTree ();
+
+	// Check lock status (may have changed since last refresh)
+	CheckLockStatus ();
 	UpdateActionButtons ();
 
 	ACAPI_WriteReport ("ClassSync: RefreshData done.", false);
+}
+
+
+// ---------------------------------------------------------------------------
+// Toggle write lock on the XML database
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::DoToggleLock ()
+{
+	if (xmlFilePath.IsEmpty ()) return;
+
+	if (writeMode) {
+		// Release our lock
+		ReleaseLock (xmlFilePath);
+		writeMode = false;
+		buttonLock.SetText ("Open for write");
+		ACAPI_WriteReport ("ClassSync: Write lock released", false);
+		UpdateActionButtons ();
+		return;
+	}
+
+	// Try to acquire lock
+	LockInfo info = GetLockInfo (xmlFilePath);
+	if (info.locked) {
+		// Someone else holds the lock - show alert
+		GS::UniString msg = "Database is locked by " + info.user
+			+ " since " + info.time
+			+ "\nClick Refresh to check if it becomes available.";
+		DGAlert (DG_INFORMATION, "ClassSync", "Database is locked", msg, "OK");
+		return;
+	}
+
+	if (AcquireLock (xmlFilePath)) {
+		writeMode = true;
+		buttonLock.SetText ("Close write");
+		ACAPI_WriteReport ("ClassSync: Write lock acquired", false);
+		UpdateActionButtons ();
+	} else {
+		ACAPI_WriteReport ("ClassSync: Failed to acquire write lock", false);
+	}
+}
+
+
+// ---------------------------------------------------------------------------
+// Check lock file status and update UI accordingly
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::CheckLockStatus ()
+{
+	if (xmlFilePath.IsEmpty ()) {
+		writeMode = false;
+		buttonLock.Disable ();
+		return;
+	}
+
+	buttonLock.Enable ();
+
+	if (IsLockedByUs (xmlFilePath)) {
+		writeMode = true;
+		buttonLock.SetText ("Close write");
+	} else {
+		writeMode = false;
+		buttonLock.SetText ("Open for write");
+	}
+}
+
+
+// ---------------------------------------------------------------------------
+// Release lock if we hold it (static, safe to call from FreeData)
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::ReleaseLockIfHeld ()
+{
+	if (instance != nullptr && instance->writeMode) {
+		ReleaseLock (xmlFilePath);
+		instance->writeMode = false;
+		ACAPI_WriteReport ("ClassSync: Write lock auto-released", false);
+	}
 }

@@ -34,6 +34,7 @@
 /* [ 16] */ Button               250  460  110   25  LargePlain  "Use Project"
 /* [ 17] */ Button               365  460  110   25  LargePlain  "Use Server"
 /* [ 18] */ LeftText              10  535  200   16  SmallPlain  ""
+/* [ 19] */ Button               530  460  130   25  LargePlain  "Open for write"
 }
 
 'DLGH'  32600  ClassSyncPaletteDialog {
@@ -55,4 +56,5 @@
 16	""	ButtonUseProject
 17	""	ButtonUseServer
 18	""	LabelVersion
+19	""	ButtonLock
 }

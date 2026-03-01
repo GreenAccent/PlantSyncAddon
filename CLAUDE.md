@@ -41,16 +41,18 @@ ClassSyncAddon/
   Src/
     APIEnvir.h                # Boilerplate platformowy
     ClassSync.cpp             # 4 wymagane funkcje + menu handler + preferences load/save
-    ClassSyncPalette.hpp/cpp  # DG::Palette, 18 kontrolek, singleton, import/export/resolve
+    ClassSyncPalette.hpp/cpp  # DG::Palette, 19 kontrolek, singleton, import/export/resolve/lock
     ClassificationData.hpp/cpp # Model danych (z GUIDs) + odczyt z projektu + diff
     XmlReader.hpp/cpp         # Parsowanie XML klasyfikacji z pliku na dysku
     XmlWriter.hpp/cpp         # Modyfikacja XML (ChangeItemName, AddItem)
+    FileLock.hpp/cpp          # Blokada XML (.lock file obok XML)
+    ChangeLog.hpp/cpp         # Dziennik zmian (changelog/YYYY-MM-DD.txt)
   RFIX/
     ClassSyncFix.grc          # MDID (860318800, 1954174874)
   RFIX.win/
     ClassSync.rc2             # Windows resources master
   RINT/
-    ClassSync.grc             # Stringi, menu, paleta (Palette | close, 960x560, 18 items)
+    ClassSync.grc             # Stringi, menu, paleta (Palette | grow, 960x560, 19 items)
   docs/
     archicad-api.md           # Sygnatury API: DG, Classification, Preferences, FileDialog
     build-notes.md            # Komendy budowania, typowe bledy, deploy
@@ -68,12 +70,14 @@ GSErrCode FreeData(void);                                // Save prefs + cleanup
 ### Paleta (ClassSyncPalette)
 - 3 kolumny TreeView: Project | Differences | Server (XML)
 - 4 przyciski akcji: Import, Export, Use Project, Use Server
+- Przycisk "Open for write" / "Close write" (blokada XML)
 - Browse button + preferences dla sciezki XML
 - Label wersji (v0.5)
 - Kolory: zielony (0,130,60)=nowe, niebieski (0,80,170)=brakujace, ceglasty (180,50,0)=konflikt
 - Singleton pattern, `BeginEventProcessing()`/`EndEventProcessing()`
 - `ACAPI_RegisterModelessWindow` z APIPalMsg_* callback
 - `DG::TreeViewObserver` do sledzenia selekcji w drzewku konfliktow
+- Write mode: Export i Use Project wymagaja blokady (writeMode=true)
 
 ### Mechanizm rozwiazywania roznic
 - **Import**: `ACAPI_Classification_Import(xml, MergeConflicting, SkipConflicting)` - importuje brakujace z XML
@@ -83,11 +87,11 @@ GSErrCode FreeData(void);                                // Save prefs + cleanup
 
 ### Build & Deploy
 ```bash
-# Build (cmake pelna sciezka, bo nie w PATH):
-"C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" --build build --config Release
-
-# Deploy (reczne uruchomienie z admin):
-deploy.cmd
+./configure.sh    # CMake configure (po dodaniu nowych plikow)
+./build.sh        # Incremental build
+./rebuild.sh      # Clean + full rebuild
+./deploy.sh       # Deploy do ArchiCAD (admin, AC musi byc zamkniety)
+deploy.cmd        # Alternatywny deploy (Windows CMD)
 ```
 
 ### Konwencje
@@ -97,6 +101,10 @@ deploy.cmd
 - MSVC /MD, _ITERATOR_DEBUG_LEVEL=0
 - Po dodaniu nowych plikow .cpp/.hpp: re-run cmake configure (GLOB)
 - Preferencje: ACAPI_SetPreferences/GetPreferences z struct ClassSyncPrefs
+
+### Dokumentacja
+- Po zmianach funkcjonalnosci: zaktualizuj `MANUAL.md` (instrukcja obslugi, angielski)
+- `MANUAL.md` to jedyne zrodlo prawdy dla uzytkownikow koncowych
 
 ### Znane pulapki (gotchas)
 - DG::Palette: uzywac indywidualnych button.Attach(*this), NIE AttachToAllItems (wymaga CompoundItemObserver)

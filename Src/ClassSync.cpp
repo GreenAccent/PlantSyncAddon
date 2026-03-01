@@ -112,6 +112,9 @@ GSErrCode FreeData (void)
 	// Save preferences before cleanup
 	ClassSyncPalette::SavePreferences ();
 
+	// Release write lock if held
+	ClassSyncPalette::ReleaseLockIfHeld ();
+
 	if (ClassSyncPalette::HasInstance ())
 		ClassSyncPalette::DestroyInstance ();
 

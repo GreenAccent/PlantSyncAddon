@@ -18,19 +18,21 @@ droga to C++ API.
 - **Export** - dodaje brakujace z projektu do pliku XML
 - **Resolve Conflicts** - Use Project / Use Server dla roznic w nazwach
 - **Kolorowanie diff**: zielony=nowe, niebieski=brakujace, ceglasty=konflikt
+- **Write Mode** - blokada XML (plik `.lock`) zapobiega jednoczesnej edycji
+- **Changelog** - dzienne logi zmian w `changelog/YYYY-MM-DD.txt`
 
 ## Budowanie
 
 ```bash
-# Configure (raz, lub po dodaniu nowych plikow):
-bash configure.sh
-
-# Build:
-bash build.sh
-
-# Deploy do ArchiCAD (wymaga admin):
-bash deploy.sh
+bash configure.sh    # CMake configure (raz, lub po dodaniu nowych plikow)
+bash build.sh        # Incremental build
+bash rebuild.sh      # Clean + full rebuild
+bash deploy.sh       # Deploy do ArchiCAD (wymaga admin, AC musi byc zamkniety)
 ```
+
+## Dokumentacja
+
+Instrukcja obslugi: [MANUAL.md](MANUAL.md)
 
 ## Wymagania
 

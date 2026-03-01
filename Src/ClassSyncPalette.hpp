@@ -52,7 +52,8 @@ enum {
 	ItemButtonExport     = 15,
 	ItemButtonUseProject = 16,
 	ItemButtonUseServer  = 17,
-	ItemLabelVersion     = 18
+	ItemLabelVersion     = 18,
+	ItemButtonLock       = 19
 };
 
 
@@ -100,6 +101,9 @@ public:
 	static void  LoadPreferences ();
 	static void  SavePreferences ();
 
+	// Lock management (called from FreeData)
+	static void  ReleaseLockIfHeld ();
+
 private:
 	// DG::PanelObserver
 	virtual void  PanelCloseRequested (const DG::PanelCloseRequestEvent& ev, bool* accepted) override;
@@ -140,6 +144,8 @@ private:
 	void  DoUseProject ();
 	void  DoUseServer ();
 	void  UpdateActionButtons ();
+	void  DoToggleLock ();
+	void  CheckLockStatus ();
 
 	// Controls (items 1-11, existing)
 	DG::LeftText            labelProject;
@@ -162,6 +168,12 @@ private:
 	DG::Button              buttonUseProject;
 	DG::Button              buttonUseServer;
 	DG::LeftText            labelVersion;
+
+	// Controls (item 19, lock)
+	DG::Button              buttonLock;
+
+	// Write mode (true = we hold the .lock file)
+	bool                    writeMode;
 
 	// Data
 	GS::Array<ClassificationTree>   projectData;
