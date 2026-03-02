@@ -31,11 +31,13 @@
 /* [ 13] */ Button               770  430   90   20  SmallPlain  "Browse..."
 /* [ 14] */ Button                10  460  110   25  LargePlain  "<- Import"
 /* [ 15] */ Button               125  460  110   25  LargePlain  "Export ->"
-/* [ 16] */ Button               250  460  110   25  LargePlain  "Use Project"
+/* [ 16] */ Button               250  460  110   25  LargePlain  "Use Server ID"
 /* [ 17] */ Button               365  460  110   25  LargePlain  "Use Server"
 /* [ 18] */ LeftText              10  535  200   16  SmallPlain  ""
 /* [ 19] */ Button               530  460  130   25  LargePlain  "Open for write"
 /* [ 20] */ LeftText             670  464  120   16  LargePlain  ""
+/* [ 21] */ Button                10  490  110   25  LargePlain  "Reassign ID"
+/* [ 22] */ Button               125  490  110   25  LargePlain  "Fix Cascade"
 }
 
 'DLGH'  32600  ClassSyncPaletteDialog {
@@ -59,4 +61,6 @@
 18	""	LabelVersion
 19	""	ButtonLock
 20	""	LabelWriteMode
+21	""	ButtonReassignId
+22	""	ButtonFixCascade
 }

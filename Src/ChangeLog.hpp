@@ -14,15 +14,25 @@ void LogExport     (const GS::UniString& xmlPath,
 					const GS::UniString& itemName,
 					const GS::UniString& parentId);
 
-void LogUseProject (const GS::UniString& xmlPath,
-					const GS::UniString& itemId,
-					const GS::UniString& serverName,
-					const GS::UniString& projectName);
-
 void LogUseServer  (const GS::UniString& xmlPath,
 					const GS::UniString& itemId,
 					const GS::UniString& projectName,
 					const GS::UniString& serverName);
+
+void LogUseServerId(const GS::UniString& xmlPath,
+					const GS::UniString& oldId,
+					const GS::UniString& newId,
+					const GS::UniString& itemName);
+
+void LogReassignId (const GS::UniString& xmlPath,
+					const GS::UniString& oldId,
+					const GS::UniString& newId,
+					const GS::UniString& itemName);
+
+void LogFixCascade (const GS::UniString& xmlPath,
+					const GS::UniString& oldPrefix,
+					const GS::UniString& newPrefix,
+					UInt32 itemCount);
 
 void LogImport     (const GS::UniString& xmlPath);
 

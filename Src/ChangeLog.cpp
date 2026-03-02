@@ -141,24 +141,6 @@ void LogExport (const GS::UniString& xmlPath,
 
 
 // ---------------------------------------------------------------------------
-// Log a "Use Project" action (XML name changed to match project)
-// ---------------------------------------------------------------------------
-
-void LogUseProject (const GS::UniString& xmlPath,
-					const GS::UniString& itemId,
-					const GS::UniString& serverName,
-					const GS::UniString& projectName)
-{
-	std::string entry;
-	entry += "  Use Project (resolve conflict): " + ToUtf8 (itemId) + "\n";
-	entry += "  Server name: \"" + ToUtf8 (serverName) + "\"\n";
-	entry += "  Project name: \"" + ToUtf8 (projectName) + "\"\n";
-
-	AppendToLog (xmlPath, entry);
-}
-
-
-// ---------------------------------------------------------------------------
 // Log a "Use Server" action (project name changed to match XML)
 // ---------------------------------------------------------------------------
 
@@ -171,6 +153,62 @@ void LogUseServer (const GS::UniString& xmlPath,
 	entry += "  Use Server (resolve conflict): " + ToUtf8 (itemId) + "\n";
 	entry += "  Project name: \"" + ToUtf8 (projectName) + "\"\n";
 	entry += "  Server name: \"" + ToUtf8 (serverName) + "\"\n";
+
+	AppendToLog (xmlPath, entry);
+}
+
+
+// ---------------------------------------------------------------------------
+// Log a "Use Server ID" action (project item ID changed to match server)
+// ---------------------------------------------------------------------------
+
+void LogUseServerId (const GS::UniString& xmlPath,
+					 const GS::UniString& oldId,
+					 const GS::UniString& newId,
+					 const GS::UniString& itemName)
+{
+	std::string entry;
+	entry += "  Use Server ID (fix ID mismatch): \"" + ToUtf8 (itemName) + "\"\n";
+	entry += "  Old ID: " + ToUtf8 (oldId) + "\n";
+	entry += "  New ID: " + ToUtf8 (newId) + "\n";
+
+	AppendToLog (xmlPath, entry);
+}
+
+
+// ---------------------------------------------------------------------------
+// Log a "Reassign ID" action (project item ID changed to avoid collision)
+// ---------------------------------------------------------------------------
+
+void LogReassignId (const GS::UniString& xmlPath,
+					const GS::UniString& oldId,
+					const GS::UniString& newId,
+					const GS::UniString& itemName)
+{
+	std::string entry;
+	entry += "  Reassign ID (resolve collision): \"" + ToUtf8 (itemName) + "\"\n";
+	entry += "  Old ID: " + ToUtf8 (oldId) + "\n";
+	entry += "  New ID: " + ToUtf8 (newId) + "\n";
+
+	AppendToLog (xmlPath, entry);
+}
+
+
+// ---------------------------------------------------------------------------
+// Log a "Fix Cascade" action (batch prefix change)
+// ---------------------------------------------------------------------------
+
+void LogFixCascade (const GS::UniString& xmlPath,
+					const GS::UniString& oldPrefix,
+					const GS::UniString& newPrefix,
+					UInt32 itemCount)
+{
+	char buf[16];
+	snprintf (buf, sizeof (buf), "%u", itemCount);
+
+	std::string entry;
+	entry += "  Fix Cascade: " + ToUtf8 (oldPrefix) + " -> " + ToUtf8 (newPrefix) + "\n";
+	entry += "  Items fixed: " + std::string (buf) + "\n";
 
 	AppendToLog (xmlPath, entry);
 }

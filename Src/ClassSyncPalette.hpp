@@ -6,6 +6,7 @@
 #include "DGModule.hpp"
 #include "Color.hpp"
 #include "HashTable.hpp"
+#include "HashSet.hpp"
 #include "ClassificationData.hpp"
 
 
@@ -13,7 +14,7 @@
 // Version
 // ---------------------------------------------------------------------------
 
-static const char* kClassSyncVersion = "0.5.1";
+static const char* kClassSyncVersion = "0.6.0";
 
 
 // ---------------------------------------------------------------------------
@@ -50,11 +51,13 @@ enum {
 	ItemButtonBrowse     = 13,
 	ItemButtonImport     = 14,
 	ItemButtonExport     = 15,
-	ItemButtonUseProject = 16,
+	ItemButtonUseServerId = 16,
 	ItemButtonUseServer  = 17,
 	ItemLabelVersion     = 18,
 	ItemButtonLock       = 19,
-	ItemLabelWriteMode   = 20
+	ItemLabelWriteMode   = 20,
+	ItemButtonReassignId = 21,
+	ItemButtonFixCascade = 22
 };
 
 
@@ -142,11 +145,16 @@ private:
 	void  BrowseForXml ();
 	void  DoImportFromServer ();
 	void  DoExportToServer ();
-	void  DoUseProject ();
+	void  DoUseServerId ();
 	void  DoUseServer ();
+	void  DoReassignId ();
+	void  DoFixCascade ();
 	void  UpdateActionButtons ();
 	void  DoToggleLock ();
 	void  CheckLockStatus ();
+
+	// Helpers for ID operations
+	GS::UniString  FindNextFreeId (const GS::UniString& parentId) const;
 
 	// Controls (items 1-11, existing)
 	DG::LeftText            labelProject;
@@ -166,13 +174,17 @@ private:
 	DG::Button              buttonBrowse;
 	DG::Button              buttonImport;
 	DG::Button              buttonExport;
-	DG::Button              buttonUseProject;
+	DG::Button              buttonUseServerId;
 	DG::Button              buttonUseServer;
 	DG::LeftText            labelVersion;
 
 	// Controls (items 19-20, lock)
 	DG::Button              buttonLock;
 	DG::LeftText            labelWriteMode;
+
+	// Controls (items 21-22, new actions)
+	DG::Button              buttonReassignId;
+	DG::Button              buttonFixCascade;
 
 	// Write mode (true = we hold the .lock file)
 	bool                    writeMode;
@@ -193,6 +205,10 @@ private:
 	// Mapping: classification ID string -> tree item ID (for selection sync)
 	GS::HashTable<GS::UniString, Int32>  projectIdToTreeItem;
 	GS::HashTable<GS::UniString, Int32>  serverIdToTreeItem;
+
+	// All IDs from both sides (for FindNextFreeId)
+	GS::HashSet<GS::UniString>  allProjectIds;
+	GS::HashSet<GS::UniString>  allServerIds;
 
 	// XML file path (loaded from preferences)
 	static GS::UniString  xmlFilePath;

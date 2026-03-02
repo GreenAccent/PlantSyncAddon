@@ -29,7 +29,7 @@ Wiecej kontekstu: `docs/2026-02-28-project-context.md`
 - Developer ID: 860318800
 - ClassSync Local ID: 1954174874
 
-## Architektura add-onu (v0.5)
+## Architektura add-onu (v0.6)
 
 ### Struktura plikow
 ```
@@ -41,8 +41,8 @@ ClassSyncAddon/
   Src/
     APIEnvir.h                # Boilerplate platformowy
     ClassSync.cpp             # 4 wymagane funkcje + menu handler + preferences load/save
-    ClassSyncPalette.hpp/cpp  # DG::Palette, 19 kontrolek, singleton, import/export/resolve/lock
-    ClassificationData.hpp/cpp # Model danych (z GUIDs) + odczyt z projektu + diff
+    ClassSyncPalette.hpp/cpp  # DG::Palette, 22 kontrolki, singleton, import/export/resolve/lock
+    ClassificationData.hpp/cpp # Model danych + dwuwymiarowe dopasowanie (ID+Name) + diff
     XmlReader.hpp/cpp         # Parsowanie XML klasyfikacji z pliku na dysku
     XmlWriter.hpp/cpp         # Modyfikacja XML (ChangeItemName, AddItem)
     FileLock.hpp/cpp          # Blokada XML (.lock file obok XML, session=PID)
@@ -52,7 +52,7 @@ ClassSyncAddon/
   RFIX.win/
     ClassSync.rc2             # Windows resources master
   RINT/
-    ClassSync.grc             # Stringi, menu, paleta (Palette | grow, 960x560, 19 items)
+    ClassSync.grc             # Stringi, menu, paleta (Palette | grow, 960x560, 22 items)
   docs/
     2026-02-28-archicad-api.md      # Sygnatury API: DG, Classification, Preferences, FileDialog
     2026-02-28-build-notes.md       # Komendy budowania, typowe bledy, deploy
@@ -70,22 +70,41 @@ GSErrCode FreeData(void);                                // Save prefs + cleanup
 
 ### Paleta (ClassSyncPalette)
 - 3 kolumny TreeView: Project | Differences | Server (XML)
-- 4 przyciski akcji: Import, Export, Use Project, Use Server
+- 6 przyciskow akcji: Import, Export, Use Server ID, Use Server, Reassign ID, Fix Cascade
 - Przycisk "Open for write" / "Close write" (blokada XML)
 - Browse button + preferences dla sciezki XML
-- Label wersji (v0.5)
-- Kolory: zielony (0,130,60)=nowe, niebieski (0,80,170)=brakujace, ceglasty (180,50,0)=konflikt
+- Label wersji (v0.6)
+- Kolory: zielony (0,130,60)=nowe, niebieski (0,80,170)=brakujace, ceglasty (180,50,0)=kolizja ID, bursztynowy (200,120,0)=niezgodnosc ID
 - Singleton pattern, `BeginEventProcessing()`/`EndEventProcessing()`
 - `ACAPI_RegisterModelessWindow` z APIPalMsg_* callback
 - `DG::TreeViewObserver` do sledzenia selekcji w drzewku konfliktow
-- Write mode: Export i Use Project wymagaja blokady (writeMode=true)
-- Lock identyfikowany per sesja ArchiCAD (PID), nie per user - wiele instancji AC na jednej maszynie dziala poprawnie
+- Write mode: Export wymaga blokady (writeMode=true)
+- Lock identyfikowany per sesja ArchiCAD (PID), nie per user
+
+### Algorytm dopasowania (v0.6 — dwuwymiarowe)
+Niezalezne szukanie wg ID i wg Name, klasyfikacja wg kombinacji:
+```
+DiffStatus:  Match(S1), IdCollision(S2), IdMismatch(S3),
+             OnlyInProject(S4), OnlyInServer(S5),
+             DoubleConflict(S6), IdCascade(H1-H4)
+```
+Kaskady: jesli rodzic jest S3, potomkowie z tym samym wzorcem prefiksu -> IdCascade.
+
+### Drzewko Differences — 6 sekcji
+- ID Collisions (S2) — ceglasty, akcje: Reassign ID, Use Server
+- ID Mismatches (S3) — bursztynowy, akcja: Use Server ID
+- ID Cascades (H1-H4) — bursztynowy, akcja: Fix Cascade
+- Double Conflicts (S6) — ceglasty, akcja: Use Server ID
+- Only in Project (S4) — zielony, akcja: Export (wymaga write mode)
+- Only on Server (S5) — niebieski, akcja: Import
 
 ### Mechanizm rozwiazywania roznic
 - **Import**: `ACAPI_Classification_Import(xml, MergeConflicting, SkipConflicting)` - importuje brakujace z XML
 - **Export**: `AddItemToXml()` - dodaje brakujacy item do pliku XML (szuka rodzica po ID)
-- **Use Project**: `ChangeItemNameInXml()` - zmienia nazwe w XML na wersje z projektu
-- **Use Server**: `ACAPI_Classification_ChangeClassificationItem()` - zmienia nazwe w projekcie na wersje z XML
+- **Use Server ID**: `ACAPI_Classification_ChangeClassificationItem()` - zmienia ID w projekcie na wersje z serwera (S3/S6)
+- **Use Server**: `ACAPI_Classification_ChangeClassificationItem()` - zmienia nazwe w projekcie na wersje z XML (S2)
+- **Reassign ID**: zmienia kolidujace ID na nastepne wolne (sprawdza obie strony) (S2)
+- **Fix Cascade**: batch-zamiana prefiksu ID w projekcie na poprawny z serwera (H1-H4)
 
 ### Build & Deploy
 ```bash

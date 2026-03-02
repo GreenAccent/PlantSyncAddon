@@ -25,20 +25,33 @@ struct ClassificationTree {
 };
 
 enum class DiffStatus {
-	Match,
-	Conflict,
-	OnlyInProject,
-	OnlyInServer
+	Match,           // S1 — full match (same ID and Name)
+	IdCollision,     // S2 — same ID, different plants (different Name)
+	IdMismatch,      // S3 — same plant (same Name), different ID
+	OnlyInProject,   // S4 — exists only in project
+	OnlyInServer,    // S5 — exists only on server
+	DoubleConflict,  // S6 — ID matches plant A, Name matches plant B
+	IdCascade        // H1-H4 — descendant of an IdMismatch parent
 };
 
 struct DiffEntry {
-	GS::UniString  id;
+	GS::UniString  id;              // project-side ID (or server ID for S5)
 	GS::UniString  projectName;
 	GS::UniString  serverName;
 	GS::UniString  description;
 	DiffStatus     status;
 	API_Guid       projectItemGuid;		// GUID of item in project
 	API_Guid       projectSystemGuid;	// GUID of system in project
+
+	// S3/S6/IdCascade: the matching server-side ID (differs from project id)
+	GS::UniString  serverId;
+
+	// IdCascade: prefix pair that caused the cascade
+	GS::UniString  cascadeParentProjectId;
+	GS::UniString  cascadeParentServerId;
+
+	// IdCascade parent entry: number of affected descendants
+	UInt32          cascadeChildCount;
 };
 
 

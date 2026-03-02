@@ -29,9 +29,10 @@ GS::UniString      ClassSyncPalette::xmlFilePath;
 // Color constants (muted, 3-color scheme)
 // ---------------------------------------------------------------------------
 
-static const Gfx::Color kColorNew      (  0, 130,  60);   // dark green  - unique to this side
-static const Gfx::Color kColorMissing  (  0,  80, 170);   // dark blue   - missing (exists on other side)
-static const Gfx::Color kColorConflict (180,  50,   0);   // brick red   - conflict (same ID, different name)
+static const Gfx::Color kColorNew        (  0, 130,  60);   // dark green  - unique to this side
+static const Gfx::Color kColorMissing   (  0,  80, 170);   // dark blue   - missing (exists on other side)
+static const Gfx::Color kColorConflict  (180,  50,   0);   // brick red   - ID collision (same ID, different name)
+static const Gfx::Color kColorIdMismatch(200, 120,   0);   // amber       - ID mismatch (same name, different ID)
 
 
 // ---------------------------------------------------------------------------
@@ -56,11 +57,13 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonBrowse       (GetReference (), ItemButtonBrowse),
 	buttonImport       (GetReference (), ItemButtonImport),
 	buttonExport       (GetReference (), ItemButtonExport),
-	buttonUseProject   (GetReference (), ItemButtonUseProject),
+	buttonUseServerId   (GetReference (), ItemButtonUseServerId),
 	buttonUseServer    (GetReference (), ItemButtonUseServer),
 	labelVersion       (GetReference (), ItemLabelVersion),
 	buttonLock         (GetReference (), ItemButtonLock),
-	labelWriteMode     (GetReference (), ItemLabelWriteMode)
+	labelWriteMode     (GetReference (), ItemLabelWriteMode),
+	buttonReassignId   (GetReference (), ItemButtonReassignId),
+	buttonFixCascade   (GetReference (), ItemButtonFixCascade)
 {
 	writeMode = false;
 
@@ -70,9 +73,11 @@ ClassSyncPalette::ClassSyncPalette () :
 	buttonBrowse.Attach (*this);
 	buttonImport.Attach (*this);
 	buttonExport.Attach (*this);
-	buttonUseProject.Attach (*this);
+	buttonUseServerId.Attach (*this);
 	buttonUseServer.Attach (*this);
 	buttonLock.Attach (*this);
+	buttonReassignId.Attach (*this);
+	buttonFixCascade.Attach (*this);
 	treeConflicts.Attach (static_cast<DG::TreeViewObserver&> (*this));
 	BeginEventProcessing ();
 
@@ -88,8 +93,10 @@ ClassSyncPalette::ClassSyncPalette () :
 	// Disable action buttons initially
 	buttonImport.Disable ();
 	buttonExport.Disable ();
-	buttonUseProject.Disable ();
+	buttonUseServerId.Disable ();
 	buttonUseServer.Disable ();
+	buttonReassignId.Disable ();
+	buttonFixCascade.Disable ();
 
 	// Lock button: enable only if XML path is set
 	labelWriteMode.SetText ("WRITE MODE");
@@ -117,9 +124,11 @@ ClassSyncPalette::~ClassSyncPalette ()
 	ReleaseLockIfHeld ();
 	EndEventProcessing ();
 	treeConflicts.Detach (static_cast<DG::TreeViewObserver&> (*this));
+	buttonFixCascade.Detach (*this);
+	buttonReassignId.Detach (*this);
 	buttonLock.Detach (*this);
 	buttonUseServer.Detach (*this);
-	buttonUseProject.Detach (*this);
+	buttonUseServerId.Detach (*this);
 	buttonExport.Detach (*this);
 	buttonImport.Detach (*this);
 	buttonBrowse.Detach (*this);
@@ -244,7 +253,7 @@ void ClassSyncPalette::PanelResized (const DG::PanelResizeEvent& /*ev*/)
 	// Margins and spacing
 	const short margin = 10;
 	const short gap    = 15;
-	const short bottomArea = 150;  // space for buttons/labels below trees
+	const short bottomArea = 180;  // space for buttons/labels below trees (2 rows of action buttons)
 
 	// 3 equal columns
 	short colW = (w - 2 * margin - 2 * gap) / 3;
@@ -289,14 +298,18 @@ void ClassSyncPalette::PanelResized (const DG::PanelResizeEvent& /*ev*/)
 	labelXmlPath.SetWidth    (w - 2 * margin - 100);
 	buttonBrowse.SetPosition (w - margin - 90, xmlY);
 
-	// Action buttons row
+	// Action buttons row 1
 	buttonImport.SetPosition     (col1,       btnActY);
 	buttonExport.SetPosition     (col1 + 115, btnActY);
-	buttonUseProject.SetPosition (col1 + 230, btnActY);
+	buttonUseServerId.SetPosition (col1 + 230, btnActY);
 	buttonUseServer.SetPosition  (col1 + 345, btnActY);
 	buttonLock.SetPosition       (col1 + 520, btnActY);
 	buttonLock.SetWidth          (130);
 	labelWriteMode.SetPosition   (col1 + 660, btnActY + 4);
+
+	// Action buttons row 2
+	buttonReassignId.SetPosition (col1,       btnActY + 30);
+	buttonFixCascade.SetPosition (col1 + 115, btnActY + 30);
 
 	// Bottom row: version left, Refresh+Close right
 	labelVersion.SetPosition  (col1,            bottomY);
@@ -323,10 +336,14 @@ void ClassSyncPalette::ButtonClicked (const DG::ButtonClickEvent& ev)
 		DoImportFromServer ();
 	} else if (ev.GetSource () == &buttonExport) {
 		DoExportToServer ();
-	} else if (ev.GetSource () == &buttonUseProject) {
-		DoUseProject ();
+	} else if (ev.GetSource () == &buttonUseServerId) {
+		DoUseServerId ();
 	} else if (ev.GetSource () == &buttonUseServer) {
 		DoUseServer ();
+	} else if (ev.GetSource () == &buttonReassignId) {
+		DoReassignId ();
+	} else if (ev.GetSource () == &buttonFixCascade) {
+		DoFixCascade ();
 	} else if (ev.GetSource () == &buttonLock) {
 		DoToggleLock ();
 	}
@@ -371,7 +388,10 @@ void ClassSyncPalette::SyncSideTreeSelection (const DiffEntry& entry)
 	Int32 servItem = 0;
 
 	projectIdToTreeItem.Get (entry.id, &projItem);
-	serverIdToTreeItem.Get (entry.id, &servItem);
+
+	// For S3/S6/IdCascade, server item has a different ID
+	GS::UniString serverLookupId = entry.serverId.IsEmpty () ? entry.id : entry.serverId;
+	serverIdToTreeItem.Get (serverLookupId, &servItem);
 
 	if (projItem != 0)
 		treeProject.SelectItem (projItem);
@@ -392,8 +412,10 @@ void ClassSyncPalette::UpdateActionButtons ()
 	if (selected == 0 || selected == DG::TreeView::RootItem) {
 		buttonImport.Disable ();
 		buttonExport.Disable ();
-		buttonUseProject.Disable ();
+		buttonUseServerId.Disable ();
 		buttonUseServer.Disable ();
+		buttonReassignId.Disable ();
+		buttonFixCascade.Disable ();
 		return;
 	}
 
@@ -402,8 +424,10 @@ void ClassSyncPalette::UpdateActionButtons ()
 		// Section header or non-actionable item
 		buttonImport.Disable ();
 		buttonExport.Disable ();
-		buttonUseProject.Disable ();
+		buttonUseServerId.Disable ();
 		buttonUseServer.Disable ();
+		buttonReassignId.Disable ();
+		buttonFixCascade.Disable ();
 		return;
 	}
 
@@ -411,8 +435,10 @@ void ClassSyncPalette::UpdateActionButtons ()
 
 	buttonImport.Disable ();
 	buttonExport.Disable ();
-	buttonUseProject.Disable ();
+	buttonUseServerId.Disable ();
 	buttonUseServer.Disable ();
+	buttonReassignId.Disable ();
+	buttonFixCascade.Disable ();
 
 	switch (entry.status) {
 		case DiffStatus::OnlyInServer:
@@ -422,10 +448,19 @@ void ClassSyncPalette::UpdateActionButtons ()
 			if (writeMode)
 				buttonExport.Enable ();
 			break;
-		case DiffStatus::Conflict:
-			if (writeMode)
-				buttonUseProject.Enable ();
+		case DiffStatus::IdCollision:
+			// Same ID, different name — can reassign ID or use server name
+			buttonReassignId.Enable ();
 			buttonUseServer.Enable ();
+			break;
+		case DiffStatus::IdMismatch:
+		case DiffStatus::DoubleConflict:
+			// Same name, different ID — can adopt server's ID
+			buttonUseServerId.Enable ();
+			break;
+		case DiffStatus::IdCascade:
+			// Descendants of S3 parent — fix cascade
+			buttonFixCascade.Enable ();
 			break;
 		default:
 			break;
@@ -548,32 +583,47 @@ void ClassSyncPalette::DoExportToServer ()
 
 
 // ---------------------------------------------------------------------------
-// Use Project: update XML item name to match project
+// Use Server ID: change project item's ID to match server (S3, S6)
 // ---------------------------------------------------------------------------
 
-void ClassSyncPalette::DoUseProject ()
+void ClassSyncPalette::DoUseServerId ()
 {
-	if (xmlFilePath.IsEmpty ()) return;
-
 	Int32 selected = treeConflicts.GetSelectedItem ();
 	UInt32 diffIdx;
 	if (!conflictItemToDiffIndex.Get (selected, &diffIdx)) return;
 
 	const DiffEntry& entry = diffEntries[diffIdx];
-	if (entry.status != DiffStatus::Conflict) return;
+	if (entry.status != DiffStatus::IdMismatch &&
+		entry.status != DiffStatus::DoubleConflict) return;
+	if (entry.projectItemGuid == APINULLGuid) return;
+	if (entry.serverId.IsEmpty ()) return;
 
-	std::string pathUtf8 (xmlFilePath.ToCStr (0, MaxUSize, CC_UTF8).Get ());
-
-	bool success = ChangeItemNameInXml (pathUtf8.c_str (), entry.id, entry.projectName);
-
-	if (success) {
-		ACAPI_WriteReport ("ClassSync: XML updated - '%s' name -> '%s'", false,
-						   entry.id.ToCStr ().Get (),
-						   entry.projectName.ToCStr ().Get ());
-		LogUseProject (xmlFilePath, entry.id, entry.serverName, entry.projectName);
-	} else {
-		ACAPI_WriteReport ("ClassSync: Failed to update XML for '%s'", false,
+	API_ClassificationItem item;
+	item.guid = entry.projectItemGuid;
+	if (ACAPI_Classification_GetClassificationItem (item) != NoError) {
+		ACAPI_WriteReport ("ClassSync: Cannot find project item '%s'", false,
 						   entry.id.ToCStr ().Get ());
+		return;
+	}
+
+	GS::UniString oldId = item.id;
+	item.id = entry.serverId;
+
+	GSErrCode err = ACAPI_CallUndoableCommand (
+		GS::UniString ("ClassSync: Use Server ID"),
+		[&] () -> GSErrCode {
+			return ACAPI_Classification_ChangeClassificationItem (item);
+		});
+
+	if (err == NoError) {
+		ACAPI_WriteReport ("ClassSync: Project item ID '%s' -> '%s' (name: '%s')", false,
+						   oldId.ToCStr ().Get (),
+						   entry.serverId.ToCStr ().Get (),
+						   entry.projectName.ToCStr ().Get ());
+		LogUseServerId (xmlFilePath, oldId, entry.serverId, entry.projectName);
+	} else {
+		ACAPI_WriteReport ("ClassSync: Failed to change project item ID '%s', error %d", false,
+						   entry.id.ToCStr ().Get (), (int)err);
 	}
 
 	RefreshData ();
@@ -591,7 +641,7 @@ void ClassSyncPalette::DoUseServer ()
 	if (!conflictItemToDiffIndex.Get (selected, &diffIdx)) return;
 
 	const DiffEntry& entry = diffEntries[diffIdx];
-	if (entry.status != DiffStatus::Conflict) return;
+	if (entry.status != DiffStatus::IdCollision) return;
 	if (entry.projectItemGuid == APINULLGuid) return;
 
 	API_ClassificationItem item;
@@ -618,6 +668,283 @@ void ClassSyncPalette::DoUseServer ()
 	} else {
 		ACAPI_WriteReport ("ClassSync: Failed to change project item '%s', error %d", false,
 						   entry.id.ToCStr ().Get (), (int)err);
+	}
+
+	RefreshData ();
+}
+
+
+// ---------------------------------------------------------------------------
+// FindNextFreeId: find the next available child ID under a parent
+// Checks both project and server IDs to avoid collisions on either side.
+// ---------------------------------------------------------------------------
+
+GS::UniString ClassSyncPalette::FindNextFreeId (const GS::UniString& parentId) const
+{
+	// Collect all existing child numbers under this parent
+	Int32 maxNum = 0;
+	GS::UniString prefix = parentId + ".";
+
+	auto checkId = [&] (const GS::UniString& id) {
+		if (!id.BeginsWith (prefix))
+			return;
+		// Get the segment right after the prefix (before next dot)
+		GS::UniString rest = id.GetSubstring (prefix.GetLength (),
+			id.GetLength () - prefix.GetLength ());
+		auto dot = rest.FindFirst ('.');
+		GS::UniString segment = (dot != MaxUIndex)
+			? rest.GetSubstring (0, dot) : rest;
+		// Parse as number
+		Int32 num = 0;
+		for (UInt32 c = 0; c < segment.GetLength (); c++) {
+			char ch = (char) segment.GetChar (c);
+			if (ch >= '0' && ch <= '9')
+				num = num * 10 + (ch - '0');
+			else
+				return;  // not a pure number
+		}
+		if (num > maxNum)
+			maxNum = num;
+	};
+
+	for (auto it = allProjectIds.EnumerateBegin (); it != allProjectIds.EnumerateEnd (); ++it)
+		checkId (*it);
+	for (auto it = allServerIds.EnumerateBegin (); it != allServerIds.EnumerateEnd (); ++it)
+		checkId (*it);
+
+	Int32 nextNum = maxNum + 1;
+
+	// Determine zero-padding width from siblings
+	UInt32 padWidth = 2;  // default: 01, 02, ...
+	for (auto it = allProjectIds.EnumerateBegin (); it != allProjectIds.EnumerateEnd (); ++it) {
+		if ((*it).BeginsWith (prefix)) {
+			GS::UniString rest = (*it).GetSubstring (prefix.GetLength (),
+				(*it).GetLength () - prefix.GetLength ());
+			auto dot = rest.FindFirst ('.');
+			GS::UniString segment = (dot != MaxUIndex)
+				? rest.GetSubstring (0, dot) : rest;
+			if (segment.GetLength () > padWidth)
+				padWidth = segment.GetLength ();
+			break;  // use first sibling as reference
+		}
+	}
+
+	// Format with zero-padding
+	char buf[32];
+	snprintf (buf, sizeof (buf), "%0*d", (int)padWidth, nextNum);
+	return parentId + "." + GS::UniString (buf);
+}
+
+
+// ---------------------------------------------------------------------------
+// Reassign ID: change a colliding project item to the next free ID (S2)
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::DoReassignId ()
+{
+	Int32 selected = treeConflicts.GetSelectedItem ();
+	UInt32 diffIdx;
+	if (!conflictItemToDiffIndex.Get (selected, &diffIdx)) return;
+
+	const DiffEntry& entry = diffEntries[diffIdx];
+	if (entry.status != DiffStatus::IdCollision) return;
+	if (entry.projectItemGuid == APINULLGuid) return;
+
+	// Calculate parent ID and next free ID
+	GS::UniString parentId;
+	auto lastDot = entry.id.FindLast ('.');
+	if (lastDot != MaxUIndex)
+		parentId = entry.id.GetSubstring (0, lastDot);
+
+	GS::UniString newId = FindNextFreeId (parentId);
+
+	// Confirm with user
+	GS::UniString msg = "Reassign project item ID:\n\n"
+		"Current ID: " + entry.id + "\n"
+		"Name: \"" + entry.projectName + "\"\n\n"
+		"New ID: " + newId + "\n\n"
+		"After reassigning, export the item to server\n"
+		"and import the server item with the old ID.";
+
+	short result = DGAlert (DG_INFORMATION, "ClassSync - Reassign ID", msg, "", "Reassign", "Cancel", "");
+	if (result != DG_OK)
+		return;
+
+	// Change the item's ID in the project
+	API_ClassificationItem item;
+	item.guid = entry.projectItemGuid;
+	if (ACAPI_Classification_GetClassificationItem (item) != NoError) {
+		ACAPI_WriteReport ("ClassSync: Cannot find project item '%s'", false,
+						   entry.id.ToCStr ().Get ());
+		return;
+	}
+
+	GS::UniString oldId = item.id;
+	item.id = newId;
+
+	GSErrCode err = ACAPI_CallUndoableCommand (
+		GS::UniString ("ClassSync: Reassign ID"),
+		[&] () -> GSErrCode {
+			return ACAPI_Classification_ChangeClassificationItem (item);
+		});
+
+	if (err == NoError) {
+		ACAPI_WriteReport ("ClassSync: Reassigned ID '%s' -> '%s' (name: '%s')", false,
+						   oldId.ToCStr ().Get (),
+						   newId.ToCStr ().Get (),
+						   entry.projectName.ToCStr ().Get ());
+		LogReassignId (xmlFilePath, oldId, newId, entry.projectName);
+	} else {
+		ACAPI_WriteReport ("ClassSync: Failed to reassign ID '%s', error %d", false,
+						   entry.id.ToCStr ().Get (), (int)err);
+	}
+
+	RefreshData ();
+}
+
+
+// ---------------------------------------------------------------------------
+// Fix Cascade: batch-rename project items from wrong prefix to correct one
+// ---------------------------------------------------------------------------
+
+void ClassSyncPalette::DoFixCascade ()
+{
+	Int32 selected = treeConflicts.GetSelectedItem ();
+	UInt32 diffIdx;
+	if (!conflictItemToDiffIndex.Get (selected, &diffIdx)) return;
+
+	const DiffEntry& entry = diffEntries[diffIdx];
+
+	// Accept IdCascade items or IdMismatch items with cascadeChildCount > 0
+	GS::UniString projPrefix, servPrefix;
+	if (entry.status == DiffStatus::IdCascade) {
+		projPrefix = entry.cascadeParentProjectId;
+		servPrefix = entry.cascadeParentServerId;
+	} else if (entry.status == DiffStatus::IdMismatch && entry.cascadeChildCount > 0) {
+		projPrefix = entry.id;
+		servPrefix = entry.serverId;
+	} else {
+		return;
+	}
+
+	if (projPrefix.IsEmpty () || servPrefix.IsEmpty ()) return;
+
+	// Count items to fix (the parent + all cascade children)
+	UInt32 fixCount = 0;
+	for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
+		if (diffEntries[i].status == DiffStatus::IdMismatch &&
+			diffEntries[i].id == projPrefix)
+			fixCount++;
+		if (diffEntries[i].status == DiffStatus::IdCascade &&
+			diffEntries[i].cascadeParentProjectId == projPrefix)
+			fixCount++;
+	}
+
+	// Check for collisions: would any new ID collide with existing project items?
+	bool hasCollision = false;
+	for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
+		GS::UniString newId;
+		if (diffEntries[i].status == DiffStatus::IdMismatch && diffEntries[i].id == projPrefix) {
+			newId = servPrefix;
+		} else if (diffEntries[i].status == DiffStatus::IdCascade &&
+				   diffEntries[i].cascadeParentProjectId == projPrefix) {
+			GS::UniString suffix = diffEntries[i].id.GetSubstring (
+				projPrefix.GetLength (),
+				diffEntries[i].id.GetLength () - projPrefix.GetLength ());
+			newId = servPrefix + suffix;
+		} else {
+			continue;
+		}
+
+		// Check if this new ID already exists in project (and is NOT one of our cascade items)
+		if (allProjectIds.Contains (newId)) {
+			bool isOurItem = false;
+			for (UInt32 j = 0; j < diffEntries.GetSize (); j++) {
+				if (diffEntries[j].id == newId &&
+					(diffEntries[j].status == DiffStatus::IdMismatch ||
+					 diffEntries[j].status == DiffStatus::IdCascade)) {
+					isOurItem = true;
+					break;
+				}
+			}
+			if (!isOurItem) {
+				hasCollision = true;
+				ACAPI_WriteReport ("ClassSync: Fix Cascade collision: '%s' already exists", false,
+								   newId.ToCStr ().Get ());
+				break;
+			}
+		}
+	}
+
+	if (hasCollision) {
+		DGAlert (DG_ERROR, "ClassSync - Fix Cascade",
+			"Cannot fix cascade: new IDs would collide with existing items.",
+			"Resolve individual collisions first.", "OK");
+		return;
+	}
+
+	// Confirm
+	GS::UniString msg = GS::UniString::Printf (
+		"Fix ID cascade: %s -> %s (%d items)\n\n"
+		"This will rename all items with prefix '%s'\n"
+		"to use prefix '%s' instead.",
+		projPrefix.ToCStr ().Get (),
+		servPrefix.ToCStr ().Get (),
+		fixCount,
+		projPrefix.ToCStr ().Get (),
+		servPrefix.ToCStr ().Get ());
+
+	short result = DGAlert (DG_INFORMATION, "ClassSync - Fix Cascade", msg, "", "Fix", "Cancel", "");
+	if (result != DG_OK)
+		return;
+
+	// Execute all changes in one undoable command
+	GSErrCode err = ACAPI_CallUndoableCommand (
+		GS::UniString ("ClassSync: Fix ID Cascade"),
+		[&] () -> GSErrCode {
+			for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
+				GS::UniString newId;
+				if (diffEntries[i].status == DiffStatus::IdMismatch &&
+					diffEntries[i].id == projPrefix) {
+					newId = servPrefix;
+				} else if (diffEntries[i].status == DiffStatus::IdCascade &&
+						   diffEntries[i].cascadeParentProjectId == projPrefix) {
+					GS::UniString suffix = diffEntries[i].id.GetSubstring (
+						projPrefix.GetLength (),
+						diffEntries[i].id.GetLength () - projPrefix.GetLength ());
+					newId = servPrefix + suffix;
+				} else {
+					continue;
+				}
+
+				if (diffEntries[i].projectItemGuid == APINULLGuid)
+					continue;
+
+				API_ClassificationItem item;
+				item.guid = diffEntries[i].projectItemGuid;
+				if (ACAPI_Classification_GetClassificationItem (item) != NoError)
+					continue;
+
+				item.id = newId;
+				GSErrCode itemErr = ACAPI_Classification_ChangeClassificationItem (item);
+				if (itemErr != NoError) {
+					ACAPI_WriteReport ("ClassSync: Failed to change '%s' -> '%s', error %d",
+						false, diffEntries[i].id.ToCStr ().Get (),
+						newId.ToCStr ().Get (), (int)itemErr);
+					return itemErr;
+				}
+			}
+			return NoError;
+		});
+
+	if (err == NoError) {
+		ACAPI_WriteReport ("ClassSync: Fixed cascade %s -> %s (%d items)", false,
+						   projPrefix.ToCStr ().Get (),
+						   servPrefix.ToCStr ().Get (),
+						   fixCount);
+		LogFixCascade (xmlFilePath, projPrefix, servPrefix, fixCount);
+	} else {
+		ACAPI_WriteReport ("ClassSync: Fix cascade failed, error %d", false, (int)err);
 	}
 
 	RefreshData ();
@@ -718,8 +1045,13 @@ void ClassSyncPalette::FillTreeWithNodes (DG::SingleSelTreeView& tree,
 					if (side == SideServer)
 						tree.SetItemTextColor (treeItem, kColorNew);       // green: unique to server
 					break;
-				case DiffStatus::Conflict:
-					tree.SetItemTextColor (treeItem, kColorConflict);      // brick red: conflict
+				case DiffStatus::IdCollision:
+					tree.SetItemTextColor (treeItem, kColorConflict);      // brick red: ID collision
+					break;
+				case DiffStatus::IdMismatch:
+				case DiffStatus::DoubleConflict:
+				case DiffStatus::IdCascade:
+					tree.SetItemTextColor (treeItem, kColorIdMismatch);    // amber: ID mismatch
 					break;
 				default:
 					break;
@@ -827,20 +1159,27 @@ void ClassSyncPalette::PopulateConflictsTree ()
 	treeConflicts.DisableDraw ();
 
 	// Count by status
-	UInt32 conflictCount  = 0;
-	UInt32 onlyProjCount  = 0;
-	UInt32 onlyServCount  = 0;
+	UInt32 idCollisionCount  = 0;
+	UInt32 idMismatchCount   = 0;
+	UInt32 cascadeCount      = 0;
+	UInt32 onlyProjCount     = 0;
+	UInt32 onlyServCount     = 0;
+	UInt32 doubleConflCount  = 0;
 
 	for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
 		switch (diffEntries[i].status) {
-			case DiffStatus::Conflict:      conflictCount++;  break;
-			case DiffStatus::OnlyInProject: onlyProjCount++;  break;
-			case DiffStatus::OnlyInServer:  onlyServCount++;  break;
+			case DiffStatus::IdCollision:    idCollisionCount++; break;
+			case DiffStatus::IdMismatch:     idMismatchCount++;  break;
+			case DiffStatus::IdCascade:      cascadeCount++;     break;
+			case DiffStatus::OnlyInProject:  onlyProjCount++;    break;
+			case DiffStatus::OnlyInServer:   onlyServCount++;    break;
+			case DiffStatus::DoubleConflict: doubleConflCount++; break;
 			default: break;
 		}
 	}
 
-	UInt32 totalDiffs = conflictCount + onlyProjCount + onlyServCount;
+	UInt32 totalDiffs = idCollisionCount + idMismatchCount + cascadeCount
+		+ onlyProjCount + onlyServCount + doubleConflCount;
 
 	if (totalDiffs == 0) {
 		Int32 item = treeConflicts.AppendItem (DG_TVI_ROOT);
@@ -852,16 +1191,16 @@ void ClassSyncPalette::PopulateConflictsTree ()
 		return;
 	}
 
-	// Conflicts section (same ID, different name)
-	if (conflictCount > 0) {
+	// --- ID Collisions section (S2: same ID, different Name) ---
+	if (idCollisionCount > 0) {
 		Int32 secItem = treeConflicts.AppendItem (DG_TVI_ROOT);
 		treeConflicts.SetItemText (secItem,
-			GS::UniString::Printf ("Conflicts (%d)", conflictCount));
+			GS::UniString::Printf ("ID Collisions (%d)", idCollisionCount));
 		treeConflicts.SetItemTextColor (secItem, kColorConflict);
 		conflictRootItems.Push (secItem);
 
 		for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
-			if (diffEntries[i].status == DiffStatus::Conflict) {
+			if (diffEntries[i].status == DiffStatus::IdCollision) {
 				Int32 child = treeConflicts.AppendItem (secItem);
 				GS::UniString label = diffEntries[i].id
 					+ "  P:\"" + diffEntries[i].projectName
@@ -874,7 +1213,75 @@ void ClassSyncPalette::PopulateConflictsTree ()
 		treeConflicts.ExpandItem (secItem);
 	}
 
-	// Only in Project section
+	// --- ID Mismatches section (S3: same Name, different ID) ---
+	if (idMismatchCount > 0) {
+		Int32 secItem = treeConflicts.AppendItem (DG_TVI_ROOT);
+		treeConflicts.SetItemText (secItem,
+			GS::UniString::Printf ("ID Mismatches (%d)", idMismatchCount));
+		treeConflicts.SetItemTextColor (secItem, kColorIdMismatch);
+		conflictRootItems.Push (secItem);
+
+		for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
+			if (diffEntries[i].status == DiffStatus::IdMismatch) {
+				Int32 child = treeConflicts.AppendItem (secItem);
+				GS::UniString label = "\"" + diffEntries[i].projectName
+					+ "\"  P:" + diffEntries[i].id
+					+ "  S:" + diffEntries[i].serverId;
+				if (diffEntries[i].cascadeChildCount > 0)
+					label += GS::UniString::Printf ("  (+%d)", diffEntries[i].cascadeChildCount);
+				treeConflicts.SetItemText (child, label);
+				treeConflicts.SetItemTextColor (child, kColorIdMismatch);
+				conflictItemToDiffIndex.Add (child, i);
+			}
+		}
+		treeConflicts.ExpandItem (secItem);
+	}
+
+	// --- ID Cascades section (H1-H4: descendants of S3) ---
+	if (cascadeCount > 0) {
+		Int32 secItem = treeConflicts.AppendItem (DG_TVI_ROOT);
+		treeConflicts.SetItemText (secItem,
+			GS::UniString::Printf ("ID Cascades (%d)", cascadeCount));
+		treeConflicts.SetItemTextColor (secItem, kColorIdMismatch);
+		conflictRootItems.Push (secItem);
+
+		for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
+			if (diffEntries[i].status == DiffStatus::IdCascade) {
+				Int32 child = treeConflicts.AppendItem (secItem);
+				GS::UniString label = diffEntries[i].id + " -> " + diffEntries[i].serverId
+					+ "  \"" + diffEntries[i].projectName + "\"";
+				treeConflicts.SetItemText (child, label);
+				treeConflicts.SetItemTextColor (child, kColorIdMismatch);
+				conflictItemToDiffIndex.Add (child, i);
+			}
+		}
+		treeConflicts.ExpandItem (secItem);
+	}
+
+	// --- Double Conflicts section (S6: ID→A, Name→B) ---
+	if (doubleConflCount > 0) {
+		Int32 secItem = treeConflicts.AppendItem (DG_TVI_ROOT);
+		treeConflicts.SetItemText (secItem,
+			GS::UniString::Printf ("Double Conflicts (%d)", doubleConflCount));
+		treeConflicts.SetItemTextColor (secItem, kColorConflict);
+		conflictRootItems.Push (secItem);
+
+		for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
+			if (diffEntries[i].status == DiffStatus::DoubleConflict) {
+				Int32 child = treeConflicts.AppendItem (secItem);
+				GS::UniString label = diffEntries[i].id
+					+ "  P:\"" + diffEntries[i].projectName
+					+ "\"  S(id):\"" + diffEntries[i].serverName
+					+ "\"  S(name):" + diffEntries[i].serverId;
+				treeConflicts.SetItemText (child, label);
+				treeConflicts.SetItemTextColor (child, kColorConflict);
+				conflictItemToDiffIndex.Add (child, i);
+			}
+		}
+		treeConflicts.ExpandItem (secItem);
+	}
+
+	// --- Only in Project section (S4) ---
 	if (onlyProjCount > 0) {
 		Int32 secItem = treeConflicts.AppendItem (DG_TVI_ROOT);
 		treeConflicts.SetItemText (secItem,
@@ -894,7 +1301,7 @@ void ClassSyncPalette::PopulateConflictsTree ()
 		treeConflicts.ExpandItem (secItem);
 	}
 
-	// Only on Server section
+	// --- Only on Server section (S5) ---
 	if (onlyServCount > 0) {
 		Int32 secItem = treeConflicts.AppendItem (DG_TVI_ROOT);
 		treeConflicts.SetItemText (secItem,
@@ -957,21 +1364,52 @@ void ClassSyncPalette::RefreshData ()
 	serverData  = ReadXmlClassifications (pathUtf8.c_str ());
 	ACAPI_WriteReport ("ClassSync: Server: %d systems", false, (int)serverData.GetSize ());
 
+	// Build ID sets for FindNextFreeId
+	allProjectIds.Clear ();
+	allServerIds.Clear ();
+	{
+		GS::Array<ClassificationNode> stack;
+		for (UInt32 s = 0; s < projectData.GetSize (); s++)
+			for (UInt32 r = 0; r < projectData[s].rootItems.GetSize (); r++)
+				stack.Push (projectData[s].rootItems[r]);
+		while (stack.GetSize () > 0) {
+			ClassificationNode node = stack.GetLast ();
+			stack.DeleteLast ();
+			allProjectIds.Add (node.id);
+			for (UInt32 c = 0; c < node.children.GetSize (); c++)
+				stack.Push (node.children[c]);
+		}
+		for (UInt32 s = 0; s < serverData.GetSize (); s++)
+			for (UInt32 r = 0; r < serverData[s].rootItems.GetSize (); r++)
+				stack.Push (serverData[s].rootItems[r]);
+		while (stack.GetSize () > 0) {
+			ClassificationNode node = stack.GetLast ();
+			stack.DeleteLast ();
+			allServerIds.Add (node.id);
+			for (UInt32 c = 0; c < node.children.GetSize (); c++)
+				stack.Push (node.children[c]);
+		}
+	}
+
 	// Run diff
 	SetStatus ("Comparing...");
 	diffEntries = CompareClassifications (projectData, serverData);
 
-	UInt32 matches = 0, conflicts = 0, onlyProj = 0, onlyServ = 0;
+	UInt32 matches = 0, idCollisions = 0, idMismatches = 0;
+	UInt32 onlyProj = 0, onlyServ = 0, doubleConflicts = 0, cascades = 0;
 	for (UInt32 i = 0; i < diffEntries.GetSize (); i++) {
 		switch (diffEntries[i].status) {
-			case DiffStatus::Match:         matches++;   break;
-			case DiffStatus::Conflict:      conflicts++; break;
-			case DiffStatus::OnlyInProject: onlyProj++;  break;
-			case DiffStatus::OnlyInServer:  onlyServ++;  break;
+			case DiffStatus::Match:          matches++;         break;
+			case DiffStatus::IdCollision:    idCollisions++;    break;
+			case DiffStatus::IdMismatch:     idMismatches++;    break;
+			case DiffStatus::OnlyInProject:  onlyProj++;        break;
+			case DiffStatus::OnlyInServer:   onlyServ++;        break;
+			case DiffStatus::DoubleConflict: doubleConflicts++; break;
+			case DiffStatus::IdCascade:      cascades++;        break;
 		}
 	}
-	ACAPI_WriteReport ("ClassSync: Diff: %d match, %d conflict, %d only-project, %d only-server",
-		false, matches, conflicts, onlyProj, onlyServ);
+	ACAPI_WriteReport ("ClassSync: Diff: %d match, %d id-collision, %d id-mismatch, %d only-project, %d only-server, %d double-conflict, %d cascade",
+		false, matches, idCollisions, idMismatches, onlyProj, onlyServ, doubleConflicts, cascades);
 
 	// Populate trees
 	SetStatus ("Updating trees...");
