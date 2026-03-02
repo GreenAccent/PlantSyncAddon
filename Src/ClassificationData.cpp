@@ -145,10 +145,24 @@ GS::Array<DiffEntry> CompareClassifications (
 	GS::HashTable<GS::UniString, UInt32>  serverByName;
 
 	for (UInt32 j = 0; j < serverItems.GetSize (); j++) {
-		if (!serverById.ContainsKey (serverItems[j].id))
+		if (!serverById.ContainsKey (serverItems[j].id)) {
 			serverById.Add (serverItems[j].id, j);
-		if (!serverByName.ContainsKey (serverItems[j].name))
+		} else {
+			ACAPI_WriteReport ("ClassSync WARNING: Duplicate ID on server: '%s' (items '%s' and '%s')",
+				false,
+				serverItems[j].id.ToCStr ().Get (),
+				serverItems[serverById[serverItems[j].id]].name.ToCStr ().Get (),
+				serverItems[j].name.ToCStr ().Get ());
+		}
+		if (!serverByName.ContainsKey (serverItems[j].name)) {
 			serverByName.Add (serverItems[j].name, j);
+		} else {
+			ACAPI_WriteReport ("ClassSync WARNING: Duplicate Name on server: '%s' (IDs '%s' and '%s')",
+				false,
+				serverItems[j].name.ToCStr ().Get (),
+				serverItems[serverByName[serverItems[j].name]].id.ToCStr ().Get (),
+				serverItems[j].id.ToCStr ().Get ());
+		}
 	}
 
 	// Track which server items were consumed (matched) by project items
