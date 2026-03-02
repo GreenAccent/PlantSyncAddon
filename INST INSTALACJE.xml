@@ -1,0 +1,1445 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<BuildingInformation>
+	<Classification>
+		<System>
+			<Name>GA INSTALACJI</Name>
+			<EditionVersion>01</EditionVersion>
+			<EditionDate>
+				<Year>2018</Year>
+				<Month>7</Month>
+				<Day>21</Day>
+			</EditionDate>
+			<Description/>
+			<Source/>
+			<Items>
+				<Item>
+					<ID>INST</ID>
+					<Name>INSTALACJE</Name>
+					<Description/>
+					<Children>
+						<Item>
+							<ID>EL_INST</ID>
+							<Name>INSTALACJI ELEKTRYCZNE</Name>
+							<Description/>
+							<Children>
+								<Item>
+									<ID>OS</ID>
+									<Name>OŚWIETLENIE</Name>
+									<Description/>
+									<Children>
+										<Item>
+											<ID>OS_OGR</ID>
+											<Name>OGRODOWE</Name>
+											<Description/>
+											<Children/>
+										</Item>
+										<Item>
+											<ID>OS_MA</ID>
+											<Name>MAŁEJ ARCHITEKTURY</Name>
+											<Description/>
+											<Children/>
+										</Item>
+										<Item>
+											<ID>OS_EL</ID>
+											<Name>ELEWACJI</Name>
+											<Description/>
+											<Children/>
+										</Item>
+									</Children>
+								</Item>
+								<Item>
+									<ID>KON</ID>
+									<Name>GNIAZDKA</Name>
+									<Description/>
+									<Children/>
+								</Item>
+								<Item>
+									<ID>SŁ</ID>
+									<Name>STACJA ŁADOWANIA</Name>
+									<Description>STACJA ŁADOWANIA Robotów Koszacych</Description>
+									<Children/>
+								</Item>
+								<Item>
+									<ID>EL-T</ID>
+									<Name>TRASA</Name>
+									<Description>Przebieg Trasy</Description>
+									<Children/>
+								</Item>
+							</Children>
+						</Item>
+						<Item>
+							<ID>ODW_INST</ID>
+							<Name>ODWODNIENIE</Name>
+							<Description/>
+							<Children>
+								<Item>
+									<ID>DSZ_INST</ID>
+									<Name>DESZCZÓWKA</Name>
+									<Description/>
+									<Children>
+										<Item>
+											<ID>ODW-D-TR</ID>
+											<Name>TRASA</Name>
+											<Description>Przebieg Trasy</Description>
+											<Children/>
+										</Item>
+									</Children>
+								</Item>
+								<Item>
+									<ID>DRN_INST</ID>
+									<Name>DRENAŻ</Name>
+									<Description/>
+									<Children>
+										<Item>
+											<ID>ODW-DR-TR</ID>
+											<Name>TRASA</Name>
+											<Description>Przebieg Trasy</Description>
+											<Children/>
+										</Item>
+									</Children>
+								</Item>
+								<Item>
+									<ID>KAN_INST</ID>
+									<Name>KANALIZACJA SANITARNA</Name>
+									<Description/>
+									<Children>
+										<Item>
+											<ID>KAN-TR</ID>
+											<Name>TRASA</Name>
+											<Description>Przebieg Trasy</Description>
+											<Children/>
+										</Item>
+									</Children>
+								</Item>
+							</Children>
+						</Item>
+						<Item>
+							<ID>NW</ID>
+							<Name>NAWADNIANIE</Name>
+							<Description/>
+							<Children>
+								<Item>
+									<ID>NW-SYS</ID>
+									<Name>ELEMENTY SYSTEMU NAWADNIANIA</Name>
+									<Description/>
+									<Children>
+										<Item>
+											<ID>NZ</ID>
+											<Name>ZRASZACZE</Name>
+											<Description/>
+											<Children>
+												<Item>
+													<ID>ZR_ST</ID>
+													<Name>ZRASZACZE STATYCZNE</Name>
+													<Description/>
+													<Children>
+														<Item>
+															<ID>ZR_ST-01</ID>
+															<Name>UNI-SPRAY</Name>
+															<Description>Zraszacze wynurzalne statyczne</Description>
+															<Children/>
+														</Item>
+														<Item>
+															<ID>ZR_ST-02</ID>
+															<Name>SERIA 1800</Name>
+															<Description>Zraszacze wynurzalne statyczne</Description>
+															<Children/>
+														</Item>
+													</Children>
+												</Item>
+												<Item>
+													<ID>ZR_RT</ID>
+													<Name>ZRASZACZE ROTACYJNE</Name>
+													<Description/>
+													<Children>
+														<Item>
+															<ID>ZR_RT-01</ID>
+															<Name>SERIA 3500</Name>
+															<Description>Sektorowe zraszacze wynurzalne</Description>
+															<Children/>
+														</Item>
+														<Item>
+															<ID>ZR_RT-02</ID>
+															<Name>SERIA 5000/ 5000 PLUS</Name>
+															<Description>Sektorowe i pełonoobrotowe zraszacze wynurzalne
+• modele z serii 5000 PLUS posiadają możliwość zamknięcia wypływu wody
+• modele z oznaczeniem PC posiadają mechanizm sektorowy
+• modele z oznaczeniem FC posiadają mechanizm pełnoobrotowy
+• modele z oznaczeniem 3.0 posiadają zainstalowaną dyszę 3.0
+• modele z oznaczeniem SS posiadają część wynurzalną ze stali nierdzewnej
+• modele z oznaczeniem PRS posiadają wbudowany regulator ciśnienia 3,1 bar
+• modele z oznaczeniem SAM posiadają wbudowany zawór stopowy 2,1 m
+• dla modeli bez zaworu stopowego dostępny zawór stopowy SAM 2,1 m oddzielnie
+• ciśnienie robocze: 1,7 do 4,5 bar
+• przepływ: 0,17 do 2,19 m /h</Description>
+															<Children/>
+														</Item>
+														<Item>
+															<ID>ZR_RT-03</ID>
+															<Name>FALCON 6504</Name>
+															<Description>Sektorowe i pełnoobrotowe zraszacze wynurzalne, stosowane na terenach zieleni oraz obiektach sportowych</Description>
+															<Children/>
+														</Item>
+													</Children>
+												</Item>
+											</Children>
+										</Item>
+										<Item>
+											<ID>NL</ID>
+											<Name>LINIE KROPLUJĄCE</Name>
+											<Description/>
+											<Children/>
+										</Item>
+										<Item>
+											<ID>NR</ID>
+											<Name>RURY</Name>
+											<Description/>
+											<Children/>
+										</Item>
+										<Item>
+											<ID>NP</ID>
+											<Name>PUSZKA POBORU WODY</Name>
+											<Description/>
+											<Children/>
+										</Item>
+									</Children>
+								</Item>
+								<Item>
+									<ID>NW-T</ID>
+									<Name>TRASA</Name>
+									<Description>Przebieg Trasy Orurowania
+</Description>
+									<Children/>
+								</Item>
+								<Item>
+									<ID>NW-T (P)</ID>
+									<Name>TRASA PRZEPUSTY</Name>
+									<Description>Przepusty Pod Komunikacją do puzniejszego montażu systemu
+</Description>
+									<Children/>
+								</Item>
+							</Children>
+						</Item>
+					</Children>
+				</Item>
+			</Items>
+		</System>
+	</Classification>
+	<PropertyDefinitionGroups>
+		<PropertyDefinitionGroup>
+			<Name>OŚWIETLENIE</Name>
+			<Description/>
+			<PropertyDefinitions>
+				<PropertyDefinition>
+					<Name>TYP OPRAWY</Name>
+					<Description/>
+					<ValueDescriptor Type="EnumerationValueDescriptor" Version="2">
+						<EnumerationValueDescriptorWithStoredValues>
+							<ValueType>3</ValueType>
+							<Values>
+								<Key>692C85CB-59D6-44A5-8295-6527199C3F95</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>SŁUPKI OŚWIETLENIOWE</Value>
+									</Variant>
+								</Value>
+								<Key>7700F7FF-02D6-42D0-82D8-C08A7D19A126</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>REFLEKTORY OŚWIETLENIOWE</Value>
+									</Variant>
+								</Value>
+								<Key>4B53754E-EA93-4BF5-A041-5CB2B124EE83</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>LAMPY DOGRUNTOWE</Value>
+									</Variant>
+								</Value>
+								<Key>497A74E0-32B3-4004-90F5-54F260D8C5B5</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>KULE ŚWIETLNE</Value>
+									</Variant>
+								</Value>
+								<Key>813EC340-1346-4B1F-B2F1-560145E64D2C</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>LATARNIE</Value>
+									</Variant>
+								</Value>
+								<Key>72653A74-8708-4782-98B4-CBD82470D9EE</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>LAMPA WISZĄCA</Value>
+									</Variant>
+								</Value>
+								<Key>AAA2CB20-DFD0-4611-A4C1-D96D2DC29B57</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>KINKIETY</Value>
+									</Variant>
+								</Value>
+								<Key>23884AB2-08FC-4415-8D97-2A3E39825AB6</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>PLAFONY</Value>
+									</Variant>
+								</Value>
+								<Key>00CB35C3-8B0A-40B1-A109-FCBEAFE39F8D</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>OPRAWY OZDOBNE</Value>
+									</Variant>
+								</Value>
+								<Key>33CF2C8B-A066-43A6-85F6-CC957F910738</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>WPUSZCZANA/PODŁOGOWA</Value>
+									</Variant>
+								</Value>
+							</Values>
+						</EnumerationValueDescriptorWithStoredValues>
+						<HasMultiValue>false</HasMultiValue>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="GuidVariant">
+							<Status>UserUndefined</Status>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>PRODUCENT</Name>
+					<Description/>
+					<ValueDescriptor Type="EnumerationValueDescriptor" Version="2">
+						<EnumerationValueDescriptorWithStoredValues>
+							<ValueType>3</ValueType>
+							<Values>
+								<Key>A826F988-B9B1-4A0D-9DA8-933BF2056147</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>  </Value>
+									</Variant>
+								</Value>
+								<Key>741EB38B-728B-43DE-BA26-518703C4242E</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>SIMES</Value>
+									</Variant>
+								</Value>
+								<Key>35E19A4D-48EC-4B9E-BD88-5311F6EBE390</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>L&amp;L</Value>
+									</Variant>
+								</Value>
+								<Key>8845E05D-D9E6-4067-A993-5D77B18B93AB</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>KARMAN</Value>
+									</Variant>
+								</Value>
+								<Key>549B9A4E-81EE-4A54-896E-0F927A732BCF</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>BEGA</Value>
+									</Variant>
+								</Value>
+							</Values>
+						</EnumerationValueDescriptorWithStoredValues>
+						<HasMultiValue>false</HasMultiValue>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="GuidVariant">
+							<Status>UserUndefined</Status>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KON</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>SŁ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>NAZWA</Name>
+					<Description/>
+					<ValueDescriptor Type="SingleValueDescriptor">
+						<ValueType>String</ValueType>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="StringVariant">
+							<Status>Normal</Status>
+							<Value/>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KON</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>SŁ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>MODEL</Name>
+					<Description/>
+					<ValueDescriptor Type="SingleValueDescriptor">
+						<ValueType>String</ValueType>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="StringVariant">
+							<Status>Normal</Status>
+							<Value/>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KON</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>SŁ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>OBIEKTÓW ARCHITEKTONICZNYCH</Name>
+					<Description/>
+					<ValueDescriptor Type="EnumerationValueDescriptor" Version="2">
+						<EnumerationValueDescriptorWithStoredValues>
+							<ValueType>3</ValueType>
+							<Values>
+								<Key>CFA33909-D277-4DF8-A206-0E43D94C897A</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>KINKIET ELEWACYJNY</Value>
+									</Variant>
+								</Value>
+								<Key>0E61D781-6C71-4CDA-984B-AEE76677D1E1</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>PASEK LED</Value>
+									</Variant>
+								</Value>
+								<Key>20DDC25C-499F-445B-A4F7-083AC8357A15</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>OCZKO HALOGENOWE</Value>
+									</Variant>
+								</Value>
+								<Key>8178BAE6-1C25-423B-BA8B-8B8525A9CDD3</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>LAMPA WISZĄCA</Value>
+									</Variant>
+								</Value>
+							</Values>
+						</EnumerationValueDescriptorWithStoredValues>
+						<HasMultiValue>false</HasMultiValue>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="GuidVariant">
+							<Status>UserUndefined</Status>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ODW_INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KAN_INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW-SYS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NZ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-03</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NP</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>Moc, W</Name>
+					<Description/>
+					<ValueDescriptor Type="SingleValueDescriptor">
+						<ValueType>Numeric</ValueType>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="NumVariant">
+							<Status>UserUndefined</Status>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KON</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>SŁ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>Zasilanie</Name>
+					<Description/>
+					<ValueDescriptor Type="SingleValueDescriptor">
+						<ValueType>String</ValueType>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="StringVariant">
+							<Status>Normal</Status>
+							<Value/>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KON</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>SŁ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>Jednostki</Name>
+					<Description/>
+					<ValueDescriptor Type="SingleValueDescriptor">
+						<ValueType>String</ValueType>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="StringVariant">
+							<Status>UserUndefined</Status>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KON</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>SŁ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ODW_INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KAN_INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW-SYS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NZ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-03</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NP</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>OBWÓD</Name>
+					<Description/>
+					<ValueDescriptor Type="EnumerationValueDescriptor" Version="2">
+						<EnumerationValueDescriptorWithStoredValues>
+							<ValueType>3</ValueType>
+							<Values>
+								<Key>237C5E2D-E9C9-44DF-A607-F39AB121191A</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>1</Value>
+									</Variant>
+								</Value>
+								<Key>B6D1DC82-88B6-463C-A444-AAD238E2CC66</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>2</Value>
+									</Variant>
+								</Value>
+								<Key>9E8FE5CD-3960-4516-879B-31DB6285FB3B</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>3</Value>
+									</Variant>
+								</Value>
+								<Key>D89634CF-53FE-4175-B72A-07442AD7D9AB</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>4</Value>
+									</Variant>
+								</Value>
+								<Key>CC4BFEA3-C5A0-42E5-9489-E29CD637B2AF</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>5</Value>
+									</Variant>
+								</Value>
+								<Key>027A368C-6B92-43C0-B858-B43C12FFD9DA</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>6</Value>
+									</Variant>
+								</Value>
+								<Key>59BCB5CA-9FCD-4EED-A567-A7E2BCDD0863</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>7</Value>
+									</Variant>
+								</Value>
+								<Key>04086356-0AD0-43B1-95B1-BA6A4BAB670A</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>8</Value>
+									</Variant>
+								</Value>
+								<Key>6CC28C17-862C-446B-A3AC-42B52306A367</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>9</Value>
+									</Variant>
+								</Value>
+								<Key>B22C64C0-B85F-457C-9FED-FBC920F27E31</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>10</Value>
+									</Variant>
+								</Value>
+								<Key>F333ED80-F1D5-43DD-93F7-C01E16BFC893</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>11</Value>
+									</Variant>
+								</Value>
+								<Key>CC9DE2E3-EA02-4149-8718-5C6B5BEC7EE8</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>12</Value>
+									</Variant>
+								</Value>
+								<Key>88D984AB-811D-4FE6-8C34-1A44E8ABADFE</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>13</Value>
+									</Variant>
+								</Value>
+								<Key>ECBE977E-2DC9-4C4D-B73F-C50F67683C48</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>14</Value>
+									</Variant>
+								</Value>
+								<Key>7E732BFA-B963-4AD0-A22A-2FED3E98C19F</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>15</Value>
+									</Variant>
+								</Value>
+							</Values>
+						</EnumerationValueDescriptorWithStoredValues>
+						<HasMultiValue>false</HasMultiValue>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="GuidVariant">
+							<Status>UserUndefined</Status>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>EL_INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KON</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>SŁ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ODW_INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KAN_INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW-SYS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NZ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-03</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NP</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>NUMERACJA</Name>
+					<Description/>
+					<ValueDescriptor Type="SingleValueDescriptor">
+						<ValueType>Integer</ValueType>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="IntVariant">
+							<Status>UserUndefined</Status>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>EL_INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KON</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>SŁ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW-SYS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NZ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-03</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NP</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>NUMERACJA (1)</Name>
+					<Description/>
+					<ValueDescriptor Type="SingleValueDescriptor">
+						<ValueType>Integer</ValueType>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Expression</DefaultValueType>
+						<ExpressionDefaultValue>
+							<Expression>STRTONUM ( {Property:OŚWIETLENIE/OBWÓD} )</Expression>
+						</ExpressionDefaultValue>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>EL_INST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>KON</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>SŁ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NW-SYS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NZ</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_ST-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-01</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-02</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>ZR_RT-03</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>NP</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+				<PropertyDefinition>
+					<Name>System Sterowania</Name>
+					<Description/>
+					<ValueDescriptor Type="EnumerationValueDescriptor" Version="2">
+						<EnumerationValueDescriptorWithStoredValues>
+							<ValueType>3</ValueType>
+							<Values>
+								<Key>651F2F76-A4F9-4066-A0B6-5D160BC3BD1A</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>ON/OFF</Value>
+									</Variant>
+								</Value>
+								<Key>0024C116-2535-4C9C-B7CC-A27421EE3D95</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value>DALI</Value>
+									</Variant>
+								</Value>
+								<Key>870AF718-ABB9-47FD-9532-447A1D89836A</Key>
+								<Value Empty="false">
+									<Variant Type="StringVariant">
+										<Status>Normal</Status>
+										<Value> </Value>
+									</Variant>
+								</Value>
+							</Values>
+						</EnumerationValueDescriptorWithStoredValues>
+						<HasMultiValue>false</HasMultiValue>
+					</ValueDescriptor>
+					<MeasureType>Default</MeasureType>
+					<DefaultValue>
+						<DefaultValueType>Basic</DefaultValueType>
+						<Variant Type="GuidVariant">
+							<Status>UserUndefined</Status>
+						</Variant>
+					</DefaultValue>
+					<ClassificationIDs>
+						<ClassificationID>
+							<ItemID>OS</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_OGR</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_MA</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+						<ClassificationID>
+							<ItemID>OS_EL</ItemID>
+							<SystemIDName>GA INSTALACJI</SystemIDName>
+							<SystemIDVersion>01</SystemIDVersion>
+						</ClassificationID>
+					</ClassificationIDs>
+				</PropertyDefinition>
+			</PropertyDefinitions>
+		</PropertyDefinitionGroup>
+	</PropertyDefinitionGroups>
+</BuildingInformation>
