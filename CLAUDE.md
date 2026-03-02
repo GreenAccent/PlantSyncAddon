@@ -3,7 +3,7 @@
 ## Projekt
 Add-on C++ do ArchiCAD synchronizujacy system klasyfikacji roslin "Green Accent PLANTS"
 miedzy projektami ArchiCAD a wspoldzielonym plikiem master XML.
-Wiecej kontekstu: `docs/project-context.md`
+Wiecej kontekstu: `docs/2026-02-28-project-context.md`
 
 ## Srodowisko (stacja produkcyjna - NIE MODYFIKOWAC plikow poza tym katalogiem!)
 
@@ -18,12 +18,12 @@ Wiecej kontekstu: `docs/project-context.md`
   - Biblioteki: `Support/Lib/ACAP_STAT.lib`
   - Moduly: `Support/Modules/` (~60 modulow: GSRoot, DGLib, Geometry, JSON...)
   - Przyklady: `Examples/` (Classification_Test, DG_Test, Panel_Test, Property_Test...)
-- Szczegoly API: `docs/archicad-api.md`
+- Szczegoly API: `docs/2026-02-28-archicad-api.md`
 
 ### Visual Studio & Build
 - **VS 2022 Community** z toolsetem **v142** (VS 2019 compat)
 - cmake/msbuild NIE sa w PATH - uzywac pelnych sciezek
-- Szczegoly budowania: `docs/build-notes.md`
+- Szczegoly budowania: `docs/2026-02-28-build-notes.md`
 
 ### Graphisoft Developer Registration
 - Developer ID: 860318800
@@ -54,9 +54,10 @@ ClassSyncAddon/
   RINT/
     ClassSync.grc             # Stringi, menu, paleta (Palette | grow, 960x560, 19 items)
   docs/
-    archicad-api.md           # Sygnatury API: DG, Classification, Preferences, FileDialog
-    build-notes.md            # Komendy budowania, typowe bledy, deploy
-    project-context.md        # Kontekst biznesowy, drzewo klasyfikacji, properties
+    2026-02-28-archicad-api.md      # Sygnatury API: DG, Classification, Preferences, FileDialog
+    2026-02-28-build-notes.md       # Komendy budowania, typowe bledy, deploy
+    2026-02-28-project-context.md   # Kontekst biznesowy, drzewo klasyfikacji, properties
+    2026-03-02-sync-redesign.md     # Przypadki niezgodnosci i strategie synchronizacji
 ```
 
 ### Wymagane 4 funkcje (eksportowane przez ACAP_STAT.lib)
