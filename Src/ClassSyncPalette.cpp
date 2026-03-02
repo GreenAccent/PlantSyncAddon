@@ -552,6 +552,15 @@ void ClassSyncPalette::DoExportToServer ()
 	const DiffEntry& entry = diffEntries[diffIdx];
 	if (entry.status != DiffStatus::OnlyInProject) return;
 
+	// Warn user: changes to XML affect ALL projects
+	short confirm = DGAlert (DG_WARNING, "ClassSync - Export to Server",
+		"This will modify the shared XML database.",
+		"The change will be visible to all projects that use this XML file.\n\n"
+		"Item: " + entry.id + " \"" + entry.projectName + "\"",
+		"Export", "Cancel", "");
+	if (confirm != DG_OK)
+		return;
+
 	ClassificationNode node;
 	node.id          = entry.id;
 	node.name        = entry.projectName;
